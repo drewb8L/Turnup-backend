@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.Entities;
 using Turnup.Services;
+using Turnup.Services.ProductService;
 
 namespace Turnup.Controllers;
 
@@ -11,20 +12,18 @@ namespace Turnup.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
-    private readonly TurnupDbContext _context;
+    
+    private readonly IProductService _productService;
 
-    public ProductController(TurnupDbContext context)
+    public ProductController(IProductService productService)
     {
-        _context = context;
+        
+        _productService = productService;
     }
     [HttpGet]
-    public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProduct()
+    public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProducts()
     {
-        var products = await _context.Products.ToListAsync();
-        var response = new ServiceResponse<List<Product>>()
-        {
-            Data = products
-        };
-        return Ok(response);
+        var result = await _productService.GetProductsAsync();
+        return Ok(result);
     }
 }
