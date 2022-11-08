@@ -8,14 +8,11 @@ public class UnitTest1
            Assert.Equal(4, Add(2, 2));
        }
    
-       [Fact]
-       public void FailTest()
-       {
-           Assert.Equal(4, Add(2, 3));
-       }
-   
+          
        public int Add(int x, int y)
        {
            return x + y;
+           
        }
 }
+       
