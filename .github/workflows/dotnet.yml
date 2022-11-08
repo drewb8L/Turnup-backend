@@ -7,6 +7,7 @@ on: [push]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +21,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: cd tests && dotnet restore && dotnet test
-    - name: Run Test
-      run: dotnet test --verbosity normal
+      run: dotnet test --no-build --verbosity normal
