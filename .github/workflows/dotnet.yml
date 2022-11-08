@@ -3,11 +3,10 @@
 
 name: .NET
 
-on:
-  push:
-  jobs:
-  build:
+on: [push]
 
+jobs:
+  build:
     runs-on: ubuntu-latest
 
     steps:
