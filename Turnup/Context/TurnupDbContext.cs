@@ -17,4 +17,5 @@ public class TurnupDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    
 }
