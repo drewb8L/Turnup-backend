@@ -7,5 +7,5 @@ public class User
     public byte[] PasswordHash { get; set; }
     public byte[] PasswordSalt { get; set; }
 
-    public UserType UserType { get; set; }
+    //public UserType UserType { get; set; }
 }
