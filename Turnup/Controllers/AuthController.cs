@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Turnup.DTOs;
-using Turnup.Models;
+using Turnup.Entities;
 
 namespace Turnup.Controllers;
 
