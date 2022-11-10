@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Turnup.Context;
 
@@ -10,9 +11,10 @@ using Turnup.Context;
 namespace Turnup.Migrations
 {
     [DbContext(typeof(TurnupDbContext))]
-    partial class TurnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221110215546_removeOldUserEntity")]
+    partial class removeOldUserEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
