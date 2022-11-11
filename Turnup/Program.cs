@@ -1,7 +1,9 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Turnup.Configurations;
 using Turnup.Context;
@@ -17,7 +19,7 @@ builder.Services.AddControllers()
 builder.Services.AddDbContext<TurnupDbContext>(options =>
 {
     options.UseSqlServer("name=DefaultConnection");
-    
+
 });
 
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
@@ -27,13 +29,14 @@ builder.Services.AddAuthentication(options =>
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        
     })
     .AddJwtBearer(jwt =>
     {
         var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtConfig:Secret").Value);
         
         jwt.SaveToken = true;
-        jwt.TokenValidationParameters = new TokenValidationParameters()
+        jwt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -41,9 +44,18 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = false, //Only in dev
             RequireExpirationTime = false, // Only dev
             // TODO: refresh tokens and set exp
-            ValidateLifetime = true
+            ValidateLifetime = true,
+            
+            
         };
     });
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        
+    })
+    .AddEntityFrameworkStores<TurnupDbContext>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
