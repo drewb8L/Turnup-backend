@@ -2,10 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Turnup.DTOs;
 
-public class LogingRequestDTO
+public class AuthUserRegisterDTO
 {
+    [Required]
+    public string Name { get; set; }
     [Required]
     public string Email { get; set; }
     [Required]
     public string Password { get; set; }
+    
+    
 }

@@ -4,7 +4,7 @@ using Turnup.Entities;
 
 namespace Turnup.Context;
 
-public class TurnupDbContext : IdentityDbContext
+public class TurnupDbContext : IdentityDbContext<AuthUser>
 {
     public TurnupDbContext(DbContextOptions options) : base(options)
     {
@@ -23,7 +23,7 @@ public class TurnupDbContext : IdentityDbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    
+    public AuthUser AuthUser { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Cart> Carts { get; set; }
     
