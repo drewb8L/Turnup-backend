@@ -19,13 +19,13 @@ public class AuthenticationController : ControllerBase
     private readonly UserManager<AuthUser> _userManager;
 
     private readonly IConfiguration _configuration;
-    //private readonly JwtConfig _jwtConfig;
+    
 
     public AuthenticationController(UserManager<AuthUser> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _configuration = configuration;
-        //_jwtConfig = jwtConfig;
+        
     }
 
 
@@ -83,11 +83,11 @@ public class AuthenticationController : ControllerBase
     
     [HttpPost]
     [Route("login")]
-    public async Task<ActionResult> Login([FromBody] LoginRequestDTO loginRequestDto)
+    public async Task<ActionResult> Login([FromBody] AuthUserLoginDTO authUserLoginDto)
     {
         if (ModelState.IsValid)
         {
-            var existingUser = await _userManager.FindByEmailAsync(loginRequestDto.Email);
+            var existingUser = await _userManager.FindByEmailAsync(authUserLoginDto.Email);
             if (existingUser is null)
                 return BadRequest(new AuthResult()
                 {
@@ -98,7 +98,7 @@ public class AuthenticationController : ControllerBase
                     Result = false
                 });
 
-            var validInfo = await _userManager.CheckPasswordAsync(existingUser, loginRequestDto.Password);
+            var validInfo = await _userManager.CheckPasswordAsync(existingUser, authUserLoginDto.Password);
 
             if (!validInfo)
                 return BadRequest(new AuthResult()
