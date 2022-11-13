@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Turnup.Configurations;
 using Turnup.Context;
+using Turnup.Entities;
 using Turnup.Services.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +51,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+builder.Services.AddIdentity<AuthUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
         

@@ -4,17 +4,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Turnup.Controllers;
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
+//[Authorize(Roles = "customer")]
 [Route("api/[controller]")]
 [ApiController]
 public class DevPlaygroundController : ControllerBase
 {
     
     
-    [HttpGet("playground")]
+    [HttpGet]
     public async Task<ActionResult<string>> Get()
     {
-        return Ok("Hello World");
+        var headers = HttpContext.Request.Headers.Authorization.ToString();
+        return Ok($"Headers: {headers}");
     }
 
     [HttpPost]
@@ -23,5 +25,7 @@ public class DevPlaygroundController : ControllerBase
     {
         return Ok(text);
     }
+    
+    
 }
 

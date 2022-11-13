@@ -16,12 +16,12 @@ namespace Turnup.Controllers;
 [ApiController]
 public class AuthenticationController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<AuthUser> _userManager;
 
     private readonly IConfiguration _configuration;
     //private readonly JwtConfig _jwtConfig;
 
-    public AuthenticationController(UserManager<IdentityUser> userManager, IConfiguration configuration)
+    public AuthenticationController(UserManager<AuthUser> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -31,7 +31,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [Route("Register")]
-    public async Task<ActionResult> Register([FromBody] UserRegistrationRequestDTO requestDto)
+    public async Task<ActionResult> Register([FromBody] AuthUserRegisterDTO requestDto)
     {
         if (ModelState.IsValid)
         {
@@ -49,10 +49,12 @@ public class AuthenticationController : ControllerBase
                 });
             }
 
-            var newUser = new IdentityUser()
+            var newUser = new AuthUser()
             {
+                Name = requestDto.Name,
                 UserName = requestDto.Email,
                 Email = requestDto.Email,
+                Role = "customer"
             };
 
             var createUser = await _userManager.CreateAsync(newUser, requestDto.Password);
@@ -81,11 +83,11 @@ public class AuthenticationController : ControllerBase
     
     [HttpPost]
     [Route("login")]
-    public async Task<ActionResult> Login([FromBody] LogingRequestDTO logingRequestDto)
+    public async Task<ActionResult> Login([FromBody] LoginRequestDTO loginRequestDto)
     {
         if (ModelState.IsValid)
         {
-            var existingUser = await _userManager.FindByEmailAsync(logingRequestDto.Email);
+            var existingUser = await _userManager.FindByEmailAsync(loginRequestDto.Email);
             if (existingUser is null)
                 return BadRequest(new AuthResult()
                 {
@@ -96,7 +98,7 @@ public class AuthenticationController : ControllerBase
                     Result = false
                 });
 
-            var validInfo = await _userManager.CheckPasswordAsync(existingUser, logingRequestDto.Password);
+            var validInfo = await _userManager.CheckPasswordAsync(existingUser, loginRequestDto.Password);
 
             if (!validInfo)
                 return BadRequest(new AuthResult()
@@ -127,7 +129,7 @@ public class AuthenticationController : ControllerBase
         });
     }
 
-    private string GenerateJwtToken(IdentityUser user)
+    private string GenerateJwtToken(AuthUser user)
     {
         var jwtTokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtConfig:Secret").Value);
@@ -137,6 +139,7 @@ public class AuthenticationController : ControllerBase
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim("Id", user.Id),
+                new Claim(ClaimTypes.Role, user.Role ),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Email, value: user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
