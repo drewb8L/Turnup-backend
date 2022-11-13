@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +8,7 @@ using Turnup.DTOs;
 using Turnup.Entities;
 
 namespace Turnup.Controllers;
-
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
 [Route("api/[controller]")]
 [ApiController]
 public class CartController : ControllerBase
@@ -26,6 +28,7 @@ public class CartController : ControllerBase
 
         if (cart is null) return new CartDTO(); //NotFound();
 
+        Console.WriteLine($"JWT: {User.Claims.FirstOrDefault().Value}");
         return MapCartToDto(cart);
 
     }
@@ -71,16 +74,16 @@ public class CartController : ControllerBase
         return await _context.Carts
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(c => c.CustomerId == Request.Cookies["CustomerId"]);
+            .FirstOrDefaultAsync(c => c.CustomerId == User.Claims.FirstOrDefault().Value );
         
         
     }
 
     private Cart CreateCart()
     {
-        var customerId = Guid.NewGuid().ToString();
+        var customerId = User.Claims.FirstOrDefault().Value;//Guid.NewGuid().ToString();
         var cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
-        Response.Cookies.Append("customerId", customerId, cookieOptions);
+        //Response.Cookies.Append("customerId", customerId, cookieOptions);
         var cart = new Cart { CustomerId = customerId };
         _context.Carts.Add(cart);
         return cart;
