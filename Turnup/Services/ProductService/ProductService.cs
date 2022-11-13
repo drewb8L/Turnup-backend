@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.Entities;
@@ -21,5 +22,25 @@ public class ProductService : IProductService
         };
 
         return response;
+    }
+
+    public async Task<ServiceResponse<Product>> CreateNewProduct(string title, string description, string imageUrl, long price )
+    {
+        var newProduct = new ServiceResponse<Product>
+        {
+            Data = new Product()
+            {
+                Title = title,
+                Description = description,
+                ImageUrl = imageUrl,
+                Price = price,
+            }
+
+        };
+
+         await _context.AddAsync(newProduct.Data);
+        await _context.SaveChangesAsync();
+
+        return newProduct;
     }
 }

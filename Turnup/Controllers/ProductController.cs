@@ -26,4 +26,11 @@ public class ProductController : ControllerBase
         var result = await _productService.GetProductsAsync();
         return Ok(result);
     }
+
+    [HttpPost]
+    public async Task<ActionResult<ServiceResponse<Product>>> CreateNewProduct(string title, string description, string imageUrl, long price )
+    {
+        var result = await _productService.CreateNewProduct(title, description, imageUrl, price);
+        return Ok(result);
+    }
 }

@@ -26,5 +26,7 @@ public class TurnupDbContext : IdentityDbContext<AuthUser>
     public AuthUser AuthUser { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Cart> Carts { get; set; }
+
+    public DbSet<Establishment> Establishments { get; set; }
     
 }
