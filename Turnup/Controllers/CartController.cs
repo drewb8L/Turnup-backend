@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +8,7 @@ using Turnup.DTOs;
 using Turnup.Entities;
 
 namespace Turnup.Controllers;
-
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
 [Route("api/[controller]")]
 [ApiController]
 public class CartController : ControllerBase
@@ -21,11 +23,12 @@ public class CartController : ControllerBase
     [HttpGet(Name = "GetCart")]
     public async Task<ActionResult<CartDTO>> Get()
     {
-        // TODO: Find storage for CustomerId outside of cookies
+        
         var cart = await GetCart();
 
         if (cart is null) return new CartDTO(); //NotFound();
 
+        Console.WriteLine($"JWT: {User.Claims.FirstOrDefault().Value}");
         return MapCartToDto(cart);
 
     }
@@ -42,8 +45,7 @@ public class CartController : ControllerBase
         cart.AddItem(product, quantity);
         var result = await _context.SaveChangesAsync() > 0;
         if(result) return CreatedAtRoute("GetCart", MapCartToDto(cart));
-        Console.WriteLine($"Result:{result}");
-        Console.WriteLine($"Cookie{Request.Headers.Cookie.ToString()}");
+        
         
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
     }
@@ -58,8 +60,7 @@ public class CartController : ControllerBase
         cart.RemoveItem(product.Id, quantity);
         var result = await _context.SaveChangesAsync() > 0;
         if(result) return StatusCode(201);
-        Console.WriteLine($"Result:{result}");
-        Console.WriteLine($"Cookie{Request.Headers.Cookie.ToString()}");
+        
         
         return BadRequest(new ProblemDetails { Title = "There's an issue removing your item to the cart!" });
     }
@@ -71,16 +72,14 @@ public class CartController : ControllerBase
         return await _context.Carts
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(c => c.CustomerId == Request.Cookies["CustomerId"]);
+            .FirstOrDefaultAsync(c => c.CustomerId == User.Claims.FirstOrDefault().Value );
         
         
     }
 
     private Cart CreateCart()
     {
-        var customerId = Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
-        Response.Cookies.Append("customerId", customerId, cookieOptions);
+        var customerId = User.Claims.FirstOrDefault().Value;
         var cart = new Cart { CustomerId = customerId };
         _context.Carts.Add(cart);
         return cart;
@@ -104,11 +103,3 @@ public class CartController : ControllerBase
     }
 }
 
-/*
- * Request.Headers.Cookie.ToString()
- * Store customerID curl gets new id everytime
- * Options for replacing cookies
- * Write to file
- * Maui Preferences
- * Maui storage
-*/

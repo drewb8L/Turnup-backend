@@ -3,18 +3,22 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Turnup;
 using Turnup.Configurations;
 using Turnup.Context;
 using Turnup.Entities;
+using Turnup.Services.EstablishmentService;
 using Turnup.Services.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
@@ -83,6 +87,7 @@ builder.Services.AddSwaggerGen(c => {
             new string[] {}
         }
     });
+    //c.SchemaFilter<EnumSchemaFilter>();
 });
 
 
@@ -90,6 +95,7 @@ builder.Services.AddSwaggerGen(c => {
     o.AddPolicy("AllowAll", a => 
         a.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
 
 var app = builder.Build();
 

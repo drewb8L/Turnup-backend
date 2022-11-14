@@ -5,7 +5,7 @@ public class Order
     public int Id { get; set; }
     public string CustomerId { get; set; }
     public DateTime OrderDate { get; set; } = DateTime.Now;
-    public List<OrderItem> OrderItems { get; set; }
+    public List<Product> OrderItems { get; set; }
     public long SubTotal { get; set; }
     public long ServiceFee { get; set; }
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
