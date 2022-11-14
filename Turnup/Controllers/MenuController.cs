@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Turnup.Entities;
+using Turnup.Entities.OrderEntities;
 using Turnup.Services;
 using Turnup.Services.ProductService;
 
@@ -27,6 +28,11 @@ public class MenuController : ControllerBase
         var result = await _productService.GetProductsAsync(establishmentId);
         return Ok(result);
     }
-    
-    
+
+    [HttpPost]
+    [Route("place-order")]
+    public async Task<ActionResult<ServiceResponse<Order>>> PlaceOrder()
+    {
+        throw new NotImplementedException();
+    }
 }
