@@ -31,7 +31,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost]
     [Route("Register")]
-    public async Task<ActionResult> Register([FromBody] AuthUserRegisterDTO requestDto)
+    public async Task<ActionResult> Register([FromBody] AuthUserRegisterDTO requestDto, Roles role)
     {
         if (ModelState.IsValid)
         {
@@ -49,12 +49,13 @@ public class AuthenticationController : ControllerBase
                 });
             }
 
-            var newUser = new AuthUser()
+            
+            var newUser = new AuthUser
             {
                 Name = requestDto.Name,
                 UserName = requestDto.Email,
                 Email = requestDto.Email,
-                Role = "customer"
+                Role = role.ToString()
             };
 
             var createUser = await _userManager.CreateAsync(newUser, requestDto.Password);

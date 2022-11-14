@@ -8,6 +8,8 @@ public class Establishment
     [MaxLength(50)]
     public string Name { get; set; }
 
-    public Menu Menu { get; set; } = new();
-    public int MenuId { get; set; }
+    // public Menu Menu { get; set; } = new();
+    // public int MenuId { get; set; }
+
+    public List<Product> Products { get; set; } = new();
 }

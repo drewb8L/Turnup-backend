@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Turnup.Context;
 
@@ -11,9 +12,10 @@ using Turnup.Context;
 namespace Turnup.Migrations
 {
     [DbContext(typeof(TurnupDbContext))]
-    partial class TurnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221113175654_AddUserIdToProducts")]
+    partial class AddUserIdToProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,9 +169,6 @@ namespace Turnup.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -282,6 +281,9 @@ namespace Turnup.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -289,7 +291,55 @@ namespace Turnup.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MenuId");
+
                     b.ToTable("Establishments");
+                });
+
+            modelBuilder.Entity("Turnup.Entities.Menu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("EstablishmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Menu");
+                });
+
+            modelBuilder.Entity("Turnup.Entities.MenuItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("MenuItem");
                 });
 
             modelBuilder.Entity("Turnup.Entities.Product", b =>
@@ -304,9 +354,6 @@ namespace Turnup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EstablishmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -318,14 +365,10 @@ namespace Turnup.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("userId")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<int>("userId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EstablishmentId");
 
                     b.ToTable("Products");
                 });
@@ -400,11 +443,34 @@ namespace Turnup.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Turnup.Entities.Product", b =>
+            modelBuilder.Entity("Turnup.Entities.Establishment", b =>
                 {
-                    b.HasOne("Turnup.Entities.Establishment", null)
-                        .WithMany("Products")
-                        .HasForeignKey("EstablishmentId");
+                    b.HasOne("Turnup.Entities.Menu", "Menu")
+                        .WithMany()
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+                });
+
+            modelBuilder.Entity("Turnup.Entities.MenuItem", b =>
+                {
+                    b.HasOne("Turnup.Entities.Menu", "Menu")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Turnup.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Turnup.Entities.Cart", b =>
@@ -412,9 +478,9 @@ namespace Turnup.Migrations
                     b.Navigation("Items");
                 });
 
-            modelBuilder.Entity("Turnup.Entities.Establishment", b =>
+            modelBuilder.Entity("Turnup.Entities.Menu", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("MenuItems");
                 });
 #pragma warning restore 612, 618
         }

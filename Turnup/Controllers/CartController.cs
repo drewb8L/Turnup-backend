@@ -23,7 +23,7 @@ public class CartController : ControllerBase
     [HttpGet(Name = "GetCart")]
     public async Task<ActionResult<CartDTO>> Get()
     {
-        // TODO: Find storage for CustomerId outside of cookies
+        
         var cart = await GetCart();
 
         if (cart is null) return new CartDTO(); //NotFound();
@@ -45,8 +45,7 @@ public class CartController : ControllerBase
         cart.AddItem(product, quantity);
         var result = await _context.SaveChangesAsync() > 0;
         if(result) return CreatedAtRoute("GetCart", MapCartToDto(cart));
-        Console.WriteLine($"Result:{result}");
-        Console.WriteLine($"Cookie{Request.Headers.Cookie.ToString()}");
+        
         
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
     }
@@ -61,8 +60,7 @@ public class CartController : ControllerBase
         cart.RemoveItem(product.Id, quantity);
         var result = await _context.SaveChangesAsync() > 0;
         if(result) return StatusCode(201);
-        Console.WriteLine($"Result:{result}");
-        Console.WriteLine($"Cookie{Request.Headers.Cookie.ToString()}");
+        
         
         return BadRequest(new ProblemDetails { Title = "There's an issue removing your item to the cart!" });
     }
@@ -81,9 +79,7 @@ public class CartController : ControllerBase
 
     private Cart CreateCart()
     {
-        var customerId = User.Claims.FirstOrDefault().Value;//Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
-        //Response.Cookies.Append("customerId", customerId, cookieOptions);
+        var customerId = User.Claims.FirstOrDefault().Value;
         var cart = new Cart { CustomerId = customerId };
         _context.Carts.Add(cart);
         return cart;
@@ -107,11 +103,3 @@ public class CartController : ControllerBase
     }
 }
 
-/*
- * Request.Headers.Cookie.ToString()
- * Store customerID curl gets new id everytime
- * Options for replacing cookies
- * Write to file
- * Maui Preferences
- * Maui storage
-*/
