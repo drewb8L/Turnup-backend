@@ -1,4 +1,5 @@
 using Turnup.Context;
+using Turnup.DTOs;
 using Turnup.Entities;
 
 namespace Turnup.Services.CartService;
@@ -12,7 +13,7 @@ public class CartService : ICartService
         _context = context;
     }
     
-    public Task<ServiceResponse<Cart>> GetUserCart()
+    public Task<ServiceResponse<Cart>> GetUserCart(string customerId)
     {
         throw new NotImplementedException();
     }
@@ -31,4 +32,6 @@ public class CartService : ICartService
     {
         throw new NotImplementedException();
     }
+    
+   
 }

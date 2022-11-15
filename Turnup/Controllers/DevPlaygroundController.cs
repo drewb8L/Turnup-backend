@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Turnup.Controllers;
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
+//[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
 //[Authorize(Roles = "customer")]
 [Route("api/[controller]")]
 [ApiController]
@@ -16,7 +16,8 @@ public class DevPlaygroundController : ControllerBase
     public async Task<ActionResult<string>> Get()
     {
         var headers = HttpContext.Request.Headers.Authorization.ToString();
-        return Ok($"Headers: {headers}");
+        return Ok($" Hello! " +
+                  $"Headers: {headers}");
     }
 
     [HttpPost]
