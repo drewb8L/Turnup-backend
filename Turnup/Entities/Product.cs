@@ -11,6 +11,6 @@ public class Product
     public long Price { get; set; }
 
     [MaxLength(256)]
-    public string userId { get; set; }
+    public string EstablishmentId { get; set; }
     
 }

@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace Turnup.Entities.OrderEntities;
 
 public class Order
-{
-    public int Id { get; set; }
+{   
+    [Key]
     [MaxLength(256)]
     public string CustomerId { get; set; }
     [MaxLength(256)]
