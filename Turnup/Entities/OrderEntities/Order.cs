@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Turnup.Entities.OrderEntities;
 
@@ -12,14 +13,24 @@ public class Order
     
     public DateTime OrderDate { get; set; } = DateTime.Now;
     
-    public List<Product> OrderItems { get; set; }
-    public long SubTotal { get; set; }
-    public long ServiceFee { get; set; }
+    public List<CartItem> OrderItems { get; set; }
+    
+    public decimal SubTotal { get; set; }
+    //public long ServiceFee { get; set; }
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
+    
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public decimal Total { get; set; }
 
-    public long GetTotal()
+    public void GetTotal()
     {
-        return SubTotal + ServiceFee;
+        var subtotal = 0.0m;
+        foreach (var product in OrderItems)
+        {
+            subtotal += product.Quantity + product.Product.Price;
+        }
+
+        SubTotal = subtotal;
     }
     
     

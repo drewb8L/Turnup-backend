@@ -7,11 +7,13 @@ public class CartDTO
     public List<CartItemDTO> Items { get; set; }
 }
 
+
+// TODO: Move to file
 public class CartItemDTO
 {
     public int ProductId { get; set; }
     public string Name { get; set; }
-    public long Price { get; set; }
+    public decimal Price { get; set; }
     public string ImgUrl { get; set; }
     public int Quantity { get; set; }
     

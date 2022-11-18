@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
+using Turnup.Services.CartService;
 
 namespace Turnup.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
@@ -13,23 +14,23 @@ namespace Turnup.Controllers;
 [ApiController]
 public class CartController : ControllerBase
 {
-    private readonly TurnupDbContext _context;
-
-    public CartController(TurnupDbContext context)
+    private readonly ICartService _cartService;
+    
+    public CartController(ICartService cartService)
     {
-        _context = context;
+        _cartService = cartService;
     }
 
     [HttpGet(Name = "GetCart")]
     public async Task<ActionResult<CartDTO>> Get()
     {
-        
-        var cart = await GetCart();
+        var customerId = User.Claims.FirstOrDefault().Value;
+        var cart = await _cartService.GetUserCart(customerId);
 
-        if (cart is null) return new CartDTO(); //NotFound();
+        if (cart.Data is null) return new CartDTO(); //NotFound();
 
         Console.WriteLine($"JWT: {User.Claims.FirstOrDefault().Value}");
-        return MapCartToDto(cart);
+        return MapCartToDto(cart.Data);
 
     }
 
@@ -39,7 +40,8 @@ public class CartController : ControllerBase
     [HttpPost("add-items")]
     public async Task<ActionResult<CartDTO>> AddItemToCart(int productId, int quantity)
     {
-        var cart = await GetCart() ?? CreateCart();
+        var cart = _cartService.GetUserCart(User.Claims.FirstOrDefault().Value);
+                  
         var product = await _context.Products.FindAsync(productId);
         if (product is null) return NotFound();
         cart.AddItem(product, quantity);
