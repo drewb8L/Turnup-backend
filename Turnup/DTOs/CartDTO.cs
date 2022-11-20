@@ -5,6 +5,8 @@ public class CartDTO
     public int Id { get; set; }
     public string CustomerId { get; set; }
     public List<CartItemDTO> Items { get; set; }
+    public decimal Subtotal { get; set; }
+    public string EstablishmentId { get; set; }
 }
 
 
@@ -16,5 +18,7 @@ public class CartItemDTO
     public decimal Price { get; set; }
     public string ImgUrl { get; set; }
     public int Quantity { get; set; }
+
+    
     
 }

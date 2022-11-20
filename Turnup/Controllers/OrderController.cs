@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
+using Turnup.DTOs;
+using Turnup.Entities;
 using Turnup.Entities.OrderEntities;
 
 namespace Turnup.Controllers;
@@ -30,11 +32,18 @@ public class OrderController : ControllerBase
         return Ok(items);
     }
 
-    [HttpPost]
+    [HttpGet]
     [Route("place-order")]
-    public async Task<ActionResult<Order>> PlaceOrder(string customerId)
+    public async Task<ActionResult<OrderItem>> PlaceOrder(string customerId)
     {
-        var items = await _context.Carts.Where(c => c.CustomerId == customerId).ToListAsync();
+        var items = await _context.Carts.Where(c => c.CustomerId == customerId)
+            .Include(p => p.Items)
+            .ThenInclude(i => i.Product)
+            .ToListAsync();
+    
+       
+       
+
         return Ok(items);
 
     }

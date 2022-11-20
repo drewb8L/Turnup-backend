@@ -42,7 +42,12 @@ public class CartService : ICartService
         return response;
     }
 
-   
+
+    public Task<ServiceResponse<Cart>> GetUserCart(string customerId)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<ServiceResponse<Cart>> AddItem()
     {
         var response = await GetUserCart();

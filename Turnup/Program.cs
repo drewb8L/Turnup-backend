@@ -97,7 +97,7 @@ builder.Services.AddSwaggerGen(c => {
         a.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
-builder.Services.AddScoped<ICartService, CartService>();
+//builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();
 
