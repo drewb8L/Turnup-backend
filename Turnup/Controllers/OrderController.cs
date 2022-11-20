@@ -23,9 +23,9 @@ public class OrderController : ControllerBase
 
     [HttpGet]
     [Route("retrieve-order")]
-    public async Task<ActionResult<Order>> RetrieveOrder(string customerId)
+    public async Task<ActionResult<Order>> RetrieveOrder(string customerId, string establishmentId)
     {
-        var items = await _context.Carts.Where(c => c.CustomerId == customerId)
+        var items = await _context.Carts.Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
             .Include(i => i.Items)
             
             .ToListAsync();
