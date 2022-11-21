@@ -24,7 +24,7 @@ public class ProductService : IProductService
         return response;
     }
 
-    public async Task<ServiceResponse<Product>> CreateNewProduct(string title, string description, string imageUrl, long price, string establishmentId )
+    public async Task<ServiceResponse<Product>> CreateNewProduct(string title, string description, string imageUrl, decimal price, string establishmentId )
     {
         var newProduct = new ServiceResponse<Product>
         {

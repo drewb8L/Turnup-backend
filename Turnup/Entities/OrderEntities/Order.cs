@@ -14,13 +14,12 @@ public class Order
     public DateTime OrderDate { get; set; } = DateTime.Now;
     
     public List<CartItem> OrderItems { get; set; }
-    
-    public decimal SubTotal { get; set; }
+    public static decimal Tax { get; set; } = 0.0635m;
+    public static decimal SubTotal { get; set; }
     //public long ServiceFee { get; set; }
     public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
-    
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public decimal Total { get; set; }
+
+    public decimal Total { get; set; } = CalculateTotal();
 
     public void GetTotal()
     {
@@ -32,7 +31,11 @@ public class Order
 
         SubTotal = subtotal;
     }
-    
+
+    public static decimal CalculateTotal()
+    {
+        return (SubTotal * Tax) + SubTotal;
+    }
     
 
 }

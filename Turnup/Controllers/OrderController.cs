@@ -40,6 +40,8 @@ public class OrderController : ControllerBase
             .Include(p => p.Items)
             .ThenInclude(i => i.Product)
             .ToListAsync();
+        
+        
     
        
        

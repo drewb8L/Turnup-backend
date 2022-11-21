@@ -19,9 +19,17 @@ public class OrderItemDTO
     public int Quantity { get; set; }
     public decimal SubTotal { get; set; }
 
+    public decimal Tax { get; set; }
+    public decimal Total { get; set; }
+
     public void calculateSubTotal()
     {
         SubTotal = Quantity * Price;
+    }
+
+    public void calculateTotal()
+    {
+        Total = (SubTotal * Tax) + SubTotal;
     }
     
 }
