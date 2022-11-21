@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.OpenApi.Extensions;
 
 namespace Turnup.Entities.OrderEntities;
 
 public class Order
 {   
-    [Key]
+    [Key] 
+    public int Id { get; set; }
     [MaxLength(256)]
     public string CustomerId { get; set; }
     [MaxLength(256)]
@@ -14,14 +16,14 @@ public class Order
     public DateTime OrderDate { get; set; } = DateTime.Now;
     
     public List<CartItem> OrderItems { get; set; }
-    public static decimal Tax { get; set; } = 0.0635m;
-    public static decimal SubTotal { get; set; }
+    public  decimal Tax { get; set; } = 0.0635m;
+    public  decimal SubTotal { get; set; }
     //public long ServiceFee { get; set; }
-    public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
+    public string Status { get; set; } 
 
-    public decimal Total { get; set; } = CalculateTotal();
+    public decimal Total { get; set; } 
 
-    public void GetTotal()
+    public void GetSubTotal()
     {
         var subtotal = 0.0m;
         foreach (var product in OrderItems)
@@ -32,7 +34,7 @@ public class Order
         SubTotal = subtotal;
     }
 
-    public static decimal CalculateTotal()
+    public  decimal CalculateTotal()
     {
         return (SubTotal * Tax) + SubTotal;
     }

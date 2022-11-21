@@ -21,32 +21,68 @@ public class OrderController : ControllerBase
         _context = context;
     }
 
+    [HttpGet(Name = "GetOrder")]
+    public async Task<ActionResult<OrderDTO>> Get(string customerId, string establishmentId)
+    {
+        
+        var order = _context.Orders
+              .Where(o => o.CustomerId == customerId && o.EstablishmentId == establishmentId)
+              .FirstOrDefaultAsync();
+
+        if (order is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(order);
+    }
+
     [HttpGet]
     [Route("retrieve-order")]
-    public async Task<ActionResult<Order>> RetrieveOrder(string customerId, string establishmentId)
+    public async Task<ActionResult<Order>> RetrieveOrder(string establishmentId)
     {
-        var items = await _context.Carts.Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
-            .Include(i => i.Items)
-            
+        var customerId = User.Claims.FirstOrDefault().Value;
+        var orders = await _context.Orders
+            .Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
+            .Include(o => o.OrderItems)
+            .ThenInclude(o => o.Product)
             .ToListAsync();
-        return Ok(items);
+        
+        
+        return Ok(orders);
     }
 
     [HttpGet]
     [Route("place-order")]
-    public async Task<ActionResult<OrderItem>> PlaceOrder(string customerId)
+    public async Task<ActionResult<Order>> PlaceOrder()
     {
-        var items = await _context.Carts.Where(c => c.CustomerId == customerId)
-            .Include(p => p.Items)
+        var customerId = User.Claims.FirstOrDefault().Value;
+        var cart = await _context.Carts.Where(c => c.CustomerId == customerId)
+            .Include(c => c.Items)
             .ThenInclude(i => i.Product)
-            .ToListAsync();
+            .FirstOrDefaultAsync();
         
         
-    
-       
-       
+        var order = new Order
+        {
+            CustomerId = customerId,
+            EstablishmentId = cart.EstablishmentId,
+            OrderDate = DateTime.Now,
+            OrderItems = cart.Items,
+            Status  = OrderStatus.Pending.ToString(),
+            SubTotal = cart.Subtotal,
+        };
 
-        return Ok(items);
+        order.Total = order.CalculateTotal();
+
+        await _context.Orders.AddAsync(order);
+        //_context.Carts.Remove(cart);
+        await _context.SaveChangesAsync();
+        
+        
+        return Ok(order);
 
     }
+
+    
 }
