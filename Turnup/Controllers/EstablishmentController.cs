@@ -64,7 +64,7 @@ public class EstablishmentController : ControllerBase
     [Route("update-order")]
     public async Task<ActionResult<Order>> UpdateOrCompleteOrder(int orderId, OrderStatus status)
     {
-        var order = await _context.Orders.Where(o => o.Id == orderId)
+        var order = await _context.Orders.Where(o => o.OrderId == orderId)
             .Include(o => o.OrderItems)
             .ThenInclude(i => i.Product).FirstOrDefaultAsync();
 

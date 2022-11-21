@@ -21,21 +21,7 @@ public class OrderController : ControllerBase
         _context = context;
     }
 
-    [HttpGet(Name = "GetOrder")]
-    public async Task<ActionResult<OrderDTO>> Get(string customerId, string establishmentId)
-    {
-        
-        var order = _context.Orders
-              .Where(o => o.CustomerId == customerId && o.EstablishmentId == establishmentId)
-              .FirstOrDefaultAsync();
-
-        if (order is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(order);
-    }
+  
 
     [HttpGet]
     [Route("retrieve-order")]
@@ -68,21 +54,46 @@ public class OrderController : ControllerBase
             CustomerId = customerId,
             EstablishmentId = cart.EstablishmentId,
             OrderDate = DateTime.Now,
-            OrderItems = cart.Items,
+            OrderItems = new List<OrderItem>(),
             Status  = OrderStatus.Pending.ToString(),
             SubTotal = cart.Subtotal,
         };
 
+        order.OrderItems.AddRange(MapCartItemToOrderItem(cart.Items));
         order.Total = order.CalculateTotal();
 
         await _context.Orders.AddAsync(order);
-        //_context.Carts.Remove(cart);
+        _context.Carts.Remove(cart);
         await _context.SaveChangesAsync();
         
         
-        return Ok(order);
+        return CreatedAtAction("RetrieveOrder", order);
 
     }
 
-    
+    private List<OrderItem> MapCartItemToOrderItem(List<CartItem> cartItems)
+    {
+        List<OrderItem> items = new List<OrderItem>();
+        
+        foreach (var item in cartItems)
+        {
+            var orderItem = new OrderItem
+            {
+                EstablishmentId = item.Product.EstablishmentId,
+                CustomerId = item.Cart.CustomerId,
+                Product = item.Product,
+                Title = item.Product.Title,
+                Quantity = item.Quantity,
+                Price = item.Product.Price,
+                ProductId = item.ProductId
+
+            };
+
+            items.Add(orderItem);
+        }
+
+        return items;
+    }
+
+
 }

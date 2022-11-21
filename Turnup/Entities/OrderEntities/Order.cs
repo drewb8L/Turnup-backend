@@ -7,7 +7,7 @@ namespace Turnup.Entities.OrderEntities;
 public class Order
 {   
     [Key] 
-    public int Id { get; set; }
+    public int OrderId { get; set; }
     [MaxLength(256)]
     public string CustomerId { get; set; }
     [MaxLength(256)]
@@ -15,7 +15,7 @@ public class Order
     
     public DateTime OrderDate { get; set; } = DateTime.Now;
     
-    public List<CartItem> OrderItems { get; set; }
+    public List<OrderItem> OrderItems { get; set; }
     public  decimal Tax { get; set; } = 0.0635m;
     public  decimal SubTotal { get; set; }
     //public long ServiceFee { get; set; }
