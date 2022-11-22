@@ -1,4 +1,7 @@
+using System.Net;
+using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Turnup.Context;
 using Turnup.Entities;
@@ -15,16 +18,21 @@ public class EstablishmentService : IEstablishmentService
         _context = context;
         _mapper = mapper;
     }
-    public async Task<ServiceResponse<Establishment>> CreateNewEstablishment(string name)
+    public async Task<ServiceResponse<Establishment>> CreateNewEstablishment(string name, string establishmentId)
     {
+        
         var newEstablishment = new ServiceResponse<Establishment>
         {
-            Data = new Establishment
+            Data = new Establishment()
             {
-                Name = name
+                Name = name,
+                EstablishmentCode  = Guid.NewGuid().ToString(),
+                Owner = establishmentId
+
             }
         };
 
+       
         await _context.AddAsync(newEstablishment.Data);
         await _context.SaveChangesAsync();
         return newEstablishment;

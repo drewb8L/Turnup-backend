@@ -7,11 +7,13 @@ using Turnup.Context;
 using Turnup.Entities;
 using Turnup.Entities.OrderEntities;
 using Turnup.Services;
+using Turnup.Services.EstablishmentService;
 using Turnup.Services.ProductService;
 
 namespace Turnup.Controllers;
 
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "establishment")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "establishment, admin" )]
+
 [Route("api/[controller]")]
 [ApiController]
 public class EstablishmentController : ControllerBase
@@ -19,12 +21,14 @@ public class EstablishmentController : ControllerBase
     
     private readonly IProductService _productService;
     private readonly TurnupDbContext _context;
+    private readonly IEstablishmentService _establishmentService;
 
-    public EstablishmentController(TurnupDbContext context, IProductService productService)
+    public EstablishmentController(TurnupDbContext context, IProductService productService, IEstablishmentService establishmentService)
     {
         
         _productService = productService;
         _context = context;
+        _establishmentService = establishmentService;
 
     }
     
@@ -75,4 +79,19 @@ public class EstablishmentController : ControllerBase
 
         return Ok(order);
     }
+
+    [HttpPost]
+    [Route("create-establishment-link")]
+    public async Task<ActionResult<ServiceResponse<Establishment>>> CreatEstablishment(string name)
+    {
+        var establishmentId = User.Claims.FirstOrDefault().Value;
+        var result = _establishmentService.CreateNewEstablishment(name, establishmentId);
+        
+
+        
+        
+        return Ok(result.Result.Data);
+    }
+
+   
 }

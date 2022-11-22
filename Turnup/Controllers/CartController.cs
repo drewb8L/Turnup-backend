@@ -114,12 +114,3 @@ public class CartController : ControllerBase
         };
     }
 }
-
-/*
- * Request.Headers.Cookie.ToString()
- * Store customerID curl gets new id everytime
- * Options for replacing cookies
- * Write to file
- * Maui Preferences
- * Maui storage
-*/
