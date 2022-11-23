@@ -65,6 +65,7 @@ builder.Services.AddIdentity<AuthUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<TurnupDbContext>();
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo {
         Title = "JWTToken_Auth_API", Version = "v1"
