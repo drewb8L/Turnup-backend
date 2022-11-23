@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Microsoft.IdentityModel.Logging;
@@ -23,9 +24,13 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+//var dbPath = Path.Join(Directory.GetCurrentDirectory(), "turnup.db");
+var conn = new SqliteConnection($"Data Source=C:\\turnupapi\\turnup.db");
+
 builder.Services.AddDbContext<TurnupDbContext>(options =>
 {
-    options.UseSqlServer("name=DefaultConnection");
+    //options.UseSqlServer("name=DefaultConnection");
+    options.UseSqlite(conn);
 
 });
 
