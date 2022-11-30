@@ -4,13 +4,32 @@
     <projectFile profileName="IIS Express">Turnup/Turnup.csproj</projectFile>
     <projectFile profileName="Turnup">Turnup/Turnup.csproj</projectFile>
     <projectFile pubXmlPath="Turnup/Properties/PublishProfiles/FolderProfile.pubxml">Turnup/Turnup.csproj</projectFile>
+    <projectFile pubXmlPath="Turnup/Properties/PublishProfiles/publish to turnup.pubxml">Turnup/Turnup.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ecb20767-1d82-4253-a918-e91c9652f54e" name="Changes" comment="" />
+    <list default="true" id="ecb20767-1d82-4253-a918-e91c9652f54e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources/b5552b79-50b5-44ae-ba7e-54026816e473.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources/b5552b79-50b5-44ae-ba7e-54026816e473.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/AuthenticationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/AuthenticationController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/ProductController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/ProductController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/ScanController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/ScanController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Entities/Establishment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Entities/Establishment.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Migrations/TurnupDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Migrations/TurnupDbContextModelSnapshot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Services/ProductService/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Services/ProductService/IProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Services/ProductService/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Services/ProductService/ProductService.cs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="MsDeploy.Local" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -54,6 +73,10 @@
   }
 }</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.Turnup">
+    <configuration name="Publish Turnup to IIS" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
+      <riderPublish configuration="Release" platform="Any CPU" publish_profile="publish to turnup.pubxml" uuid_high="873225830290902050" uuid_low="-6345110618387438340" />
+      <method v="2" />
+    </configuration>
     <configuration name="Turnup: FolderProfile" type="DotNetMsBuildPublish" factoryName="Publish to IIS">
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/Turnup/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="873225830290902050" uuid_low="-6345110618387438340" />
       <method v="2" />
@@ -101,6 +124,10 @@
       <workItem from="1668712470258" duration="708000" />
       <workItem from="1669218189838" duration="292000" />
       <workItem from="1669218496048" duration="3796000" />
+      <workItem from="1669406953660" duration="1599000" />
+      <workItem from="1669483126022" duration="4633000" />
+      <workItem from="1669495021946" duration="10391000" />
+      <workItem from="1669764511868" duration="1181000" />
     </task>
     <servers />
   </component>

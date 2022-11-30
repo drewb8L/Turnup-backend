@@ -30,6 +30,14 @@ public class ProductController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("establishment")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ServiceResponse<Establishment>>> GetEstablishment(string establishmentId)
+    {
+        var result = await _productService.GetEstablishmentDetails(establishmentId);
+        return Ok(result.Data);
+    }
+
     [HttpPost]
     public async Task<ActionResult<ServiceResponse<Product>>> CreateNewProduct(string title, string description, string imageUrl, long price )
     {

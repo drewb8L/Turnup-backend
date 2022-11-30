@@ -10,6 +10,11 @@ public class Establishment
 
     public string EstablishmentCode { get; set; }
 
+    public string? Description { get; set; }
+
+    public string? LogoUrl { get; set; }
+
+    public string? JumbotronImgUrl { get; set; }
     public string Owner { get; set; }
 
     public List<Product> Products { get; set; } = new();

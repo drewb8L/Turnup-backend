@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using Turnup.Context;
 using Turnup.Entities;
 
@@ -43,5 +44,15 @@ public class ProductService : IProductService
         await _context.SaveChangesAsync();
 
         return newProduct;
+    }
+
+    public async Task<ServiceResponse<Establishment>> GetEstablishmentDetails(string establishmentId)
+    {
+        var establishment = new ServiceResponse<Establishment>()
+        {
+            Data = await _context.Establishments.FirstOrDefaultAsync(e => e.Owner == establishmentId)
+        };
+
+        return establishment;
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Turnup.Context;
 
@@ -10,9 +11,10 @@ using Turnup.Context;
 namespace Turnup.Migrations
 {
     [DbContext(typeof(TurnupDbContext))]
-    partial class TurnupDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221127002430_AddDescriptionAndImgUrlToEstablishments")]
+    partial class AddDescriptionAndImgUrlToEstablishments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.10");
@@ -279,10 +281,7 @@ namespace Turnup.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("JumbotronImgUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LogoUrl")
+                    b.Property<string>("ImgUrl")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
