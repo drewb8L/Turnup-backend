@@ -54,14 +54,13 @@ public class CartService : ICartService
 
    
 
-    public async Task<ServiceResponse<Cart>> AddItem()
+    public async Task<ServiceResponse<Cart?>> AddItem(int productId, int quantity, Claim? user)
     {
-        var response = await GetUserCart(_establishmentId, _user);
-        if (response.Data is null)
+        var cart = await GetCart(user)?? CreateCart();
+        var response = new ServiceResponse<Cart>()
         {
-            return await CreateUserCart();
-            
-        }
+            Data = cart
+        };
 
         return response;
     }
@@ -71,8 +70,9 @@ public class CartService : ICartService
         throw new NotImplementedException();
     }
     
-    private async Task<Cart?> GetCart()
+    private async Task<Cart?> GetCart(Claim? user)
     {
+        _user = user;
         return await _context.Carts
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)

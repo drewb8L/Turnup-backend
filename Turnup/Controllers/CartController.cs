@@ -38,22 +38,19 @@ public class CartController : ControllerBase
 
     }
 
-    
-
-
     [HttpPost("add-items")]
     public async Task<ActionResult<CartDTO>> AddItemToCart(int productId, int quantity)
     {
-
-        var cart = await _cartService ?? CreateCart();
-
+        
+        _user = User.Claims.FirstOrDefault();
+        var cart = await _cartService.AddItem(productId, quantity, _user); // ?? CreateCart();
 
         var product = await _context.Products.FindAsync(productId);
         if (product is null) return NotFound();
-        cart.AddItem(product, quantity);
-        cart.Subtotal = cart.CalculateSubtotal();
+        cart.Data.AddItem(product, quantity);
+        cart.Data.Subtotal = cart.Data.CalculateSubtotal();
         var result = await _context.SaveChangesAsync() > 0;
-        if(result) return CreatedAtRoute("GetCart", MapCartToDto(cart));
+        if(result) return CreatedAtRoute("GetCart", MapCartToDto(cart.Data));
         
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
     }
