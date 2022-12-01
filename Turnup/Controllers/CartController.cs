@@ -68,7 +68,8 @@ public class CartController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> RemoveCartItem(int productId, int quantity)
     {
-        var cart = await GetCart();
+        
+        var cart = await GetCart(productId);
         if (cart is null) return NotFound();
         var product = await _context.Products.FindAsync(productId);
         if (product is null) return NotFound();
@@ -86,21 +87,18 @@ public class CartController : ControllerBase
     }
 
 
-    private async Task<Cart?> GetCart()
+    private async Task<Cart?> GetCart(int productId)
     {
-        return await _context.Carts
-            .Include(i => i.Items)
-            .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(c => c.CustomerId == User.Claims.FirstOrDefault().Value);
+        var product = await _context.Products.FindAsync(productId);
+        if (product is null)
+        {
+            return new Cart();
+        }
+        var user = User.Claims.FirstOrDefault();
+        var cart= await _cartService.GetUserCart(product.EstablishmentId, user);
+        return cart.Data;
     }
-
-    private Cart CreateCart()
-    {
-        var customerId = User.Claims.FirstOrDefault().Value;
-        var cart = new Cart { CustomerId = customerId };
-        _context.Carts.Add(cart);
-        return cart;
-    }
+    
 
     private CartDTO MapCartToDto(Cart cart)
     {
