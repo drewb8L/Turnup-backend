@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -15,6 +16,7 @@ using Turnup.Entities;
 using Turnup.Services.CartService;
 using Turnup.Services.EstablishmentService;
 using Turnup.Services.ProductService;
+using Turnup.Services.ScanService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,12 +27,12 @@ builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 //var dbPath = Path.Join(Directory.GetCurrentDirectory(), "turnup.db");
-var conn = new SqliteConnection($"Data Source=C:\\turnupapi\\turnup.db");
+//var conn = new SqliteConnection($"Data Source=C:\\turnupapi\\turnup.db");
 
 builder.Services.AddDbContext<TurnupDbContext>(options =>
 {
-    //options.UseSqlServer("name=DefaultConnection");
-    options.UseSqlite(conn);
+    options.UseSqlServer("name=DefaultConnection");
+    //options.UseSqlite(conn);
 
 });
 
@@ -101,8 +103,11 @@ builder.Services.AddSwaggerGen(c => {
     builder.Services.AddCors(o =>
     o.AddPolicy("AllowAll", a => 
         a.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
+
+
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
+builder.Services.TryAddScoped<IScanService, ScanService>();
 //builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();

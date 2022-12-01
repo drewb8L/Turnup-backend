@@ -6,6 +6,7 @@ using Turnup.Context;
 using Turnup.Entities;
 using Turnup.Services;
 using Turnup.Services.ProductService;
+using Turnup.Services.ScanService;
 
 namespace Turnup.Controllers;
 
@@ -13,25 +14,20 @@ namespace Turnup.Controllers;
 [ApiController]
 public class ScanController : ControllerBase
 {
-    private readonly TurnupDbContext _context;
-    private readonly IProductService _productService;
 
 
-    public ScanController(TurnupDbContext context, IProductService productService)
+    private readonly IScanService _scanService;
+    public ScanController(IScanService scanService)
     {
-        _context = context;
-        _productService = productService;
-
+        _scanService = scanService;
     }
 
     [HttpGet]
     public async Task<ActionResult<ServiceResponse<List<Product>>>> GetEstablishment(string establishmentCode)
     {
-        var establishment = await _context.Establishments
-            .Where(e => e.EstablishmentCode == establishmentCode).FirstAsync();
+        var products = await _scanService.GetEstablishmentProducts(establishmentCode);
 
-        var products = await _productService.GetProductsAsync(establishment.Owner);
-            
         return Ok(products.Data);
+
     }
 }
