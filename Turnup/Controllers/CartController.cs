@@ -30,10 +30,9 @@ public class CartController : ControllerBase
     public async Task<ActionResult<CartDTO>> Get(string establishmentId)
     {
         _establishmentId = establishmentId;
-        //var cart = await GetCart();
         _user = User.Claims.FirstOrDefault();
-       var cart = await _cartService.GetUserCart(establishmentId, _user);
-        if (cart.Data is null) return new CartDTO(); //NotFound();
+        var cart = await _cartService.GetUserCart(establishmentId, _user);
+        if (cart.Data.Items is null) return new CartDTO(); 
 
         return MapCartToDto(cart.Data);
 
@@ -46,7 +45,7 @@ public class CartController : ControllerBase
     public async Task<ActionResult<CartDTO>> AddItemToCart(int productId, int quantity)
     {
 
-        var cart = await GetCart() ?? CreateCart();
+        var cart = await _cartService ?? CreateCart();
 
 
         var product = await _context.Products.FindAsync(productId);
@@ -102,7 +101,7 @@ public class CartController : ControllerBase
         return new CartDTO
         {
             Id = cart.Id,
-            CustomerId = User.Claims.FirstOrDefault().Value,
+            CustomerId = cart.CustomerId, //User.Claims.FirstOrDefault().Value,
             EstablishmentId = _establishmentId,
             Items = cart.Items.Select(item => new CartItemDTO
             {

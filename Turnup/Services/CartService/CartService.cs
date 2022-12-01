@@ -24,16 +24,20 @@ public class CartService : ICartService
         
         _establishmentId = establishmentId;
         _user = user;
-        var response = new ServiceResponse<Cart?>
+        var response = new ServiceResponse<Cart>
         {
-             Data = await _context.Carts.Where(c => 
+             Data = await _context.Carts
+                 .Include(c => c.Items)
+                 .ThenInclude(i => i.Product)
+                 .Where(c => 
                  c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value 
                  && c.EstablishmentId == establishmentId).FirstOrDefaultAsync()
-            
         };
-
         return response;
     }
+    
+    
+    
     private async Task<ServiceResponse<Cart>> CreateUserCart()
     {
         var customerId = _user.Subject.Claims.FirstOrDefault().Value;
@@ -84,25 +88,6 @@ public class CartService : ICartService
         return cart;
     }
     
-    private CartDTO MapCartToDto(Cart cart)
-    {
-        
-        return new CartDTO
-        {
-            Id = cart.Id,
-            CustomerId = _user.Subject.Claims.FirstOrDefault().Value,
-            EstablishmentId = _establishmentId,
-            Items = cart.Items.Select(item => new CartItemDTO
-            {
-                ProductId = item.ProductId,
-                ImgUrl = item.Product.ImageUrl,
-                Name = item.Product.Title,
-                Price = item.Product.Price,
-                Quantity = item.Quantity,
-               
-            }).ToList(),
-            Subtotal = cart.CalculateSubtotal()
-        };
-    }
+    
    
 }

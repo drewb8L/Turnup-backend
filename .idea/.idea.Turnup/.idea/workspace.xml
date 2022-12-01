@@ -5,19 +5,17 @@
     <projectFile profileName="Turnup">Turnup/Turnup.csproj</projectFile>
     <projectFile pubXmlPath="Turnup/Properties/PublishProfiles/FolderProfile.pubxml">Turnup/Turnup.csproj</projectFile>
     <projectFile pubXmlPath="Turnup/Properties/PublishProfiles/publish to turnup.pubxml">Turnup/Turnup.csproj</projectFile>
+    <projectFile>stripe/stripe.csproj</projectFile>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ecb20767-1d82-4253-a918-e91c9652f54e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/.name" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources/b5552b79-50b5-44ae-ba7e-54026816e473.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources/b5552b79-50b5-44ae-ba7e-54026816e473.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/dataSources/b5552b79-50b5-44ae-ba7e-54026816e473.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Turnup/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/AuthenticationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/AuthenticationController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/ProductController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/ProductController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/ScanController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/ScanController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Entities/Establishment.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Entities/Establishment.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Migrations/TurnupDbContextModelSnapshot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Migrations/TurnupDbContextModelSnapshot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Services/ProductService/IProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Services/ProductService/IProductService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Turnup/Services/ProductService/ProductService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Services/ProductService/ProductService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Controllers/CartController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Controllers/CartController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Turnup/Services/CartService/CartService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Turnup/Services/CartService/CartService.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,10 +39,32 @@
       </list>
     </option>
   </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="recentNewPullRequestHead">
+      <RepoCoordinatesHolder>
+        <option name="owner" value="drewb8L" />
+        <option name="repository" value="Turnup" />
+      </RepoCoordinatesHolder>
+    </option>
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="77714df4-ae99-4130-822f-fa13072530a8" />
+        <option name="url" value="https://github.com/drewb8L/Turnup.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4888c408211e6663764d3ea9579b1ce4f5bc77edba3c9732d5c6fa411bf4c0/ControllerFactoryProvider.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/5059b2f129d6cb3b8a9dfc18a6ea43b382c63680777ca591f1e2f97e7a5/ClaimsPrincipal.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6f2c3a317ee06bc1b0766b94d4e6a045ea25c9a3da49cb9075bcee751250d4/ControllerActionInvoker.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2Hb1c899dhRMwn5ASUmtRpPbidL" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="1" />
   </component>
@@ -63,7 +83,8 @@
   &quot;keyToStringList&quot;: {
     &quot;DatabaseDriversLRU&quot;: [
       &quot;mysql&quot;,
-      &quot;sqlite&quot;
+      &quot;sqlite&quot;,
+      &quot;sqlserver&quot;
     ],
     &quot;rider.external.source.directories&quot;: [
       &quot;C:\\Users\\mlast\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache&quot;,
@@ -81,7 +102,7 @@
       <riderPublish configuration="Release" platform="Any CPU" publish_profile="FolderProfile.pubxml" pubxml_path="$PROJECT_DIR$/Turnup/Properties/PublishProfiles/FolderProfile.pubxml" uuid_high="873225830290902050" uuid_low="-6345110618387438340" />
       <method v="2" />
     </configuration>
-    <configuration name="Turnup" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
+    <configuration name="Turnup" type="LaunchSettings" factoryName=".NET Launch Settings Profile" singleton="false">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/Turnup/Turnup.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net6.0" />
       <option name="LAUNCH_PROFILE_NAME" value="Turnup" />
@@ -111,6 +132,12 @@
         <option name="Build" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue=".NET Launch Settings Profile.Turnup" />
+      <item itemvalue=".NET Launch Settings Profile.Turnup: IIS Express" />
+      <item itemvalue="Publish to IIS.Publish Turnup to IIS" />
+      <item itemvalue="Publish to IIS.Turnup: FolderProfile" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -128,6 +155,7 @@
       <workItem from="1669483126022" duration="4633000" />
       <workItem from="1669495021946" duration="10391000" />
       <workItem from="1669764511868" duration="1181000" />
+      <workItem from="1669928828680" duration="542000" />
     </task>
     <servers />
   </component>
@@ -149,5 +177,37 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Turnup/Controllers/CartController.cs</url>
+          <line>35</line>
+          <properties documentPath="$PROJECT_DIR$/Turnup/Controllers/CartController.cs" initialLine="35" containingFunctionPresentation="method 'Get'">
+            <startOffsets>
+              <option value="1179" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1207" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Turnup/Controllers/CartController.cs</url>
+          <line>99</line>
+          <properties documentPath="$PROJECT_DIR$/Turnup/Controllers/CartController.cs" initialLine="99" containingFunctionPresentation="method 'MapCartToDto'">
+            <startOffsets>
+              <option value="3184" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3185" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
