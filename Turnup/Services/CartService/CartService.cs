@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Security.Principal;
 using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.DTOs;
@@ -9,21 +10,25 @@ namespace Turnup.Services.CartService;
 public class CartService : ICartService
 {
     private readonly TurnupDbContext _context;
-    private readonly ClaimsPrincipal _user;
-    public string UserId { get; set; }
+    
+    private string _establishmentId;
+    private Claim? _user;
 
-    public CartService(TurnupDbContext context, ClaimsPrincipal user)
+    public CartService(TurnupDbContext context)
     {
         _context = context;
-        _user = user;
-        
     }
     
-    public async Task<ServiceResponse<Cart>> GetUserCart()
+    public async Task<ServiceResponse<Cart>> GetUserCart(string establishmentId, Claim? user)
     {
+        
+        _establishmentId = establishmentId;
+        _user = user;
         var response = new ServiceResponse<Cart?>
         {
-             Data = await _context.Carts.Where(c => c.CustomerId == _user.Claims.FirstOrDefault().Value).FirstOrDefaultAsync()
+             Data = await _context.Carts.Where(c => 
+                 c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value 
+                 && c.EstablishmentId == establishmentId).FirstOrDefaultAsync()
             
         };
 
@@ -31,7 +36,7 @@ public class CartService : ICartService
     }
     private async Task<ServiceResponse<Cart>> CreateUserCart()
     {
-        var customerId = _user.Claims.FirstOrDefault().Value;
+        var customerId = _user.Subject.Claims.FirstOrDefault().Value;
         var response = new ServiceResponse<Cart>
         {
             Data =  new Cart { CustomerId = customerId }
@@ -43,14 +48,11 @@ public class CartService : ICartService
     }
 
 
-    public Task<ServiceResponse<Cart>> GetUserCart(string customerId)
-    {
-        throw new NotImplementedException();
-    }
+   
 
     public async Task<ServiceResponse<Cart>> AddItem()
     {
-        var response = await GetUserCart();
+        var response = await GetUserCart(_establishmentId, _user);
         if (response.Data is null)
         {
             return await CreateUserCart();
@@ -65,5 +67,42 @@ public class CartService : ICartService
         throw new NotImplementedException();
     }
     
+    private async Task<Cart?> GetCart()
+    {
+        return await _context.Carts
+            .Include(i => i.Items)
+            .ThenInclude(p => p.Product)
+            .FirstOrDefaultAsync(c => c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value);
+        
+    }
+
+    private  Cart CreateCart()
+    {
+        var customerId =_user.Subject.Claims.FirstOrDefault().Value;
+        var cart = new Cart { CustomerId = customerId};
+        _context.Carts.Add(cart);
+        return cart;
+    }
+    
+    private CartDTO MapCartToDto(Cart cart)
+    {
+        
+        return new CartDTO
+        {
+            Id = cart.Id,
+            CustomerId = _user.Subject.Claims.FirstOrDefault().Value,
+            EstablishmentId = _establishmentId,
+            Items = cart.Items.Select(item => new CartItemDTO
+            {
+                ProductId = item.ProductId,
+                ImgUrl = item.Product.ImageUrl,
+                Name = item.Product.Title,
+                Price = item.Product.Price,
+                Quantity = item.Quantity,
+               
+            }).ToList(),
+            Subtotal = cart.CalculateSubtotal()
+        };
+    }
    
 }

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
+using Turnup.Services.CartService;
 
 namespace Turnup.Controllers;
 
@@ -17,22 +18,24 @@ public class CartController : ControllerBase
 {
     private readonly TurnupDbContext _context;
     private string _establishmentId;
-
-    public CartController(TurnupDbContext context)
+    private readonly ICartService _cartService;
+    private Claim? _user;
+    public CartController(TurnupDbContext context, ICartService cartService)
     {
         _context = context;
-        
+        _cartService = cartService;
     }
 
     [HttpGet(Name = "GetCart")]
     public async Task<ActionResult<CartDTO>> Get(string establishmentId)
     {
         _establishmentId = establishmentId;
-        var cart = await GetCart();
+        //var cart = await GetCart();
+        _user = User.Claims.FirstOrDefault();
+       var cart = await _cartService.GetUserCart(establishmentId, _user);
+        if (cart.Data is null) return new CartDTO(); //NotFound();
 
-        if (cart is null) return new CartDTO(); //NotFound();
-
-        return MapCartToDto(cart);
+        return MapCartToDto(cart.Data);
 
     }
 

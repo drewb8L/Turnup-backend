@@ -108,7 +108,7 @@ builder.Services.AddSwaggerGen(c => {
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
 builder.Services.TryAddScoped<IScanService, ScanService>();
-//builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();
 
