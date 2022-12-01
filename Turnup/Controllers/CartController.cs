@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
+using Turnup.Services;
 using Turnup.Services.CartService;
 
 namespace Turnup.Controllers;
@@ -50,12 +51,18 @@ public class CartController : ControllerBase
         if (cart.Data == null)
             return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
 
-        cart.Data.AddItem(product, quantity);
-        cart.Data.Subtotal = cart.Data.CalculateSubtotal();
-        var result = await _context.SaveChangesAsync() > 0;
+        var result = await SaveNewProduct(quantity, cart, product);
         if (result) return CreatedAtRoute("GetCart", MapCartToDto(cart.Data));
 
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
+    }
+
+    private async Task<bool> SaveNewProduct(int quantity, ServiceResponse<Cart> cart, Product product)
+    {
+        cart.Data.AddItem(product, quantity);
+        cart.Data.Subtotal = cart.Data.CalculateSubtotal();
+        var result = await _context.SaveChangesAsync() > 0;
+        return result;
     }
 
     [HttpDelete]
