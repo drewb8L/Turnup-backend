@@ -7,7 +7,7 @@ public interface ICartService
 {
     Task<ServiceResponse<Cart>> GetUserCart(string establishmentId, Claim? user);
 
-    // Task<ServiceResponse<Cart>> CreateUserCart();
+   
 
     Task<ServiceResponse<Cart>> AddItem(int productId, int quantity, Claim? user);
 

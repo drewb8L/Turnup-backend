@@ -10,7 +10,7 @@ namespace Turnup.Services.CartService;
 public class CartService : ICartService
 {
     private readonly TurnupDbContext _context;
-    
+
     private string _establishmentId;
     private Claim? _user;
 
@@ -18,50 +18,30 @@ public class CartService : ICartService
     {
         _context = context;
     }
-    
+
     public async Task<ServiceResponse<Cart>> GetUserCart(string establishmentId, Claim? user)
     {
-        
         _establishmentId = establishmentId;
         _user = user;
         var response = new ServiceResponse<Cart>
         {
-             Data = await _context.Carts
-                 .Include(c => c.Items)
-                 .ThenInclude(i => i.Product)
-                 .Where(c => 
-                 c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value 
-                 && c.EstablishmentId == establishmentId).FirstOrDefaultAsync()
+            Data = await _context.Carts
+                .Include(c => c.Items)
+                .ThenInclude(i => i.Product)
+                .Where(c =>
+                    c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value
+                    && c.EstablishmentId == establishmentId).FirstOrDefaultAsync()
         };
         return response;
     }
-    
-    
-    
-    private async Task<ServiceResponse<Cart>> CreateUserCart()
+
+    public async Task<ServiceResponse<Cart>> AddItem(int productId, int quantity, Claim? user)
     {
-        var customerId = _user.Subject.Claims.FirstOrDefault().Value;
-        var response = new ServiceResponse<Cart>
-        {
-            Data =  new Cart { CustomerId = customerId }
-
-        };
-        await _context.Carts.AddAsync(response.Data);
-        await _context.SaveChangesAsync();
-        return response;
-    }
-
-
-   
-
-    public async Task<ServiceResponse<Cart?>> AddItem(int productId, int quantity, Claim? user)
-    {
-        var cart = await GetCart(user)?? CreateCart();
+        var cart = await GetCart(user) ?? CreateCart(user);
         var response = new ServiceResponse<Cart>()
         {
             Data = cart
         };
-
         return response;
     }
 
@@ -69,6 +49,7 @@ public class CartService : ICartService
     {
         throw new NotImplementedException();
     }
+
     
     private async Task<Cart?> GetCart(Claim? user)
     {
@@ -77,17 +58,14 @@ public class CartService : ICartService
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)
             .FirstOrDefaultAsync(c => c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value);
-        
     }
 
-    private  Cart CreateCart()
+    private Cart CreateCart(Claim? user)
     {
-        var customerId =_user.Subject.Claims.FirstOrDefault().Value;
-        var cart = new Cart { CustomerId = customerId};
+        _user = user;
+        var customerId = _user.Subject.Claims.FirstOrDefault().Value;
+        var cart = new Cart { CustomerId = customerId };
         _context.Carts.Add(cart);
         return cart;
     }
-    
-    
-   
 }

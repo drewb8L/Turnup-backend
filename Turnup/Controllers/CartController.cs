@@ -20,6 +20,7 @@ public class CartController : ControllerBase
     private string _establishmentId;
     private readonly ICartService _cartService;
     private Claim? _user;
+
     public CartController(TurnupDbContext context, ICartService cartService)
     {
         _context = context;
@@ -32,26 +33,28 @@ public class CartController : ControllerBase
         _establishmentId = establishmentId;
         _user = User.Claims.FirstOrDefault();
         var cart = await _cartService.GetUserCart(establishmentId, _user);
-        if (cart.Data.Items is null) return new CartDTO(); 
+        if (cart.Data is null) return new CartDTO();
 
         return MapCartToDto(cart.Data);
-
     }
 
     [HttpPost("add-items")]
     public async Task<ActionResult<CartDTO>> AddItemToCart(int productId, int quantity)
     {
-        
         _user = User.Claims.FirstOrDefault();
         var cart = await _cartService.AddItem(productId, quantity, _user); // ?? CreateCart();
 
         var product = await _context.Products.FindAsync(productId);
         if (product is null) return NotFound();
+
+        if (cart.Data == null)
+            return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
+
         cart.Data.AddItem(product, quantity);
         cart.Data.Subtotal = cart.Data.CalculateSubtotal();
         var result = await _context.SaveChangesAsync() > 0;
-        if(result) return CreatedAtRoute("GetCart", MapCartToDto(cart.Data));
-        
+        if (result) return CreatedAtRoute("GetCart", MapCartToDto(cart.Data));
+
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
     }
 
@@ -68,33 +71,32 @@ public class CartController : ControllerBase
         {
             cart.Subtotal = 0.0m;
         }
+
         var result = await _context.SaveChangesAsync() > 0;
-        if(result) return StatusCode(201);
-        
+        if (result) return StatusCode(201);
+
         return BadRequest(new ProblemDetails { Title = "There's an issue removing your item to the cart!" });
     }
-    
-    
+
+
     private async Task<Cart?> GetCart()
     {
         return await _context.Carts
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)
             .FirstOrDefaultAsync(c => c.CustomerId == User.Claims.FirstOrDefault().Value);
-        
     }
 
-    private  Cart CreateCart()
+    private Cart CreateCart()
     {
         var customerId = User.Claims.FirstOrDefault().Value;
-        var cart = new Cart { CustomerId = customerId};
+        var cart = new Cart { CustomerId = customerId };
         _context.Carts.Add(cart);
         return cart;
     }
-    
+
     private CartDTO MapCartToDto(Cart cart)
     {
-        
         return new CartDTO
         {
             Id = cart.Id,
@@ -107,7 +109,6 @@ public class CartController : ControllerBase
                 Name = item.Product.Title,
                 Price = item.Product.Price,
                 Quantity = item.Quantity,
-               
             }).ToList(),
             Subtotal = cart.CalculateSubtotal()
         };
