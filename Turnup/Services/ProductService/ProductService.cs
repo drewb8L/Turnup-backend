@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using Turnup.Context;
 using Turnup.Entities;
 
@@ -13,18 +14,18 @@ public class ProductService : IProductService
     {
         _context = context;
     }
-    public async Task<ServiceResponse<List<Product>>> GetProductsAsync(string userId)
+    public async Task<ServiceResponse<List<Product>>> GetProductsAsync(string establishmentId)
     {
         
         var response = new ServiceResponse<List<Product>>
         {
-            Data = await _context.Products.Where(p => p.userId == userId).ToListAsync()
+            Data = await _context.Products.Where(p => p.EstablishmentId == establishmentId).ToListAsync()
         };
 
         return response;
     }
 
-    public async Task<ServiceResponse<Product>> CreateNewProduct(string title, string description, string imageUrl, long price, string userId )
+    public async Task<ServiceResponse<Product>> CreateNewProduct(string title, string description, string imageUrl, decimal price, string establishmentId )
     {
         var newProduct = new ServiceResponse<Product>
         {
@@ -34,7 +35,7 @@ public class ProductService : IProductService
                 Description = description,
                 ImageUrl = imageUrl,
                 Price = price,
-                userId = userId
+                EstablishmentId = establishmentId
             }
 
         };
@@ -43,5 +44,15 @@ public class ProductService : IProductService
         await _context.SaveChangesAsync();
 
         return newProduct;
+    }
+
+    public async Task<ServiceResponse<Establishment>> GetEstablishmentDetails(string establishmentId)
+    {
+        var establishment = new ServiceResponse<Establishment>()
+        {
+            Data = await _context.Establishments.FirstOrDefaultAsync(e => e.Owner == establishmentId)
+        };
+
+        return establishment;
     }
 }

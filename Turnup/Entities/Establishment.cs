@@ -8,8 +8,14 @@ public class Establishment
     [MaxLength(50)]
     public string Name { get; set; }
 
-    // public Menu Menu { get; set; } = new();
-    // public int MenuId { get; set; }
+    public string EstablishmentCode { get; set; }
+
+    public string? Description { get; set; }
+
+    public string? LogoUrl { get; set; }
+
+    public string? JumbotronImgUrl { get; set; }
+    public string Owner { get; set; }
 
     public List<Product> Products { get; set; } = new();
 }

@@ -2,8 +2,10 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,8 +13,10 @@ using Turnup;
 using Turnup.Configurations;
 using Turnup.Context;
 using Turnup.Entities;
+using Turnup.Services.CartService;
 using Turnup.Services.EstablishmentService;
 using Turnup.Services.ProductService;
+using Turnup.Services.ScanService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,9 +26,13 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+//var dbPath = Path.Join(Directory.GetCurrentDirectory(), "turnup.db");
+//var conn = new SqliteConnection($"Data Source=C:\\turnupapi\\turnup.db");
+
 builder.Services.AddDbContext<TurnupDbContext>(options =>
 {
     options.UseSqlServer("name=DefaultConnection");
+    //options.UseSqlite(conn);
 
 });
 
@@ -64,6 +72,7 @@ builder.Services.AddIdentity<AuthUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<TurnupDbContext>();
 
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo {
         Title = "JWTToken_Auth_API", Version = "v1"
@@ -74,7 +83,7 @@ builder.Services.AddSwaggerGen(c => {
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1safsfsdfdfd\"",
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciO...\"",
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
@@ -94,20 +103,25 @@ builder.Services.AddSwaggerGen(c => {
     builder.Services.AddCors(o =>
     o.AddPolicy("AllowAll", a => 
         a.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
+
+
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
+builder.Services.TryAddScoped<IScanService, ScanService>();
+//builder.Services.AddScoped<ICartService, CartService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
    app.UseSwagger();
    app.UseSwaggerUI();
-    
-}
+   app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
+//}
+
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 app.UseAuthentication();

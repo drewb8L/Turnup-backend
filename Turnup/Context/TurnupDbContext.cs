@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Turnup.Entities;
+using Turnup.Entities.OrderEntities;
 
 namespace Turnup.Context;
 
@@ -29,4 +30,6 @@ public class TurnupDbContext : IdentityDbContext<AuthUser>
 
     public DbSet<Establishment> Establishments { get; set; }
     
+    public DbSet<Order> Orders { get; set; }
+
 }

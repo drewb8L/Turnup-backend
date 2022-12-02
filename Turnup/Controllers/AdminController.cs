@@ -23,10 +23,10 @@ public class AdminController : ControllerBase
     
     
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<EstablishmentDTO>>> CreateEstablishment(string name)
+    public async Task<ActionResult<ServiceResponse<EstablishmentDTO>>> CreateEstablishment(string name, string establishmentId)
     {
         
-        var result = await _establishmentService.CreateNewEstablishment(name);
+        var result = await _establishmentService.CreateNewEstablishment(name, establishmentId);
         return Ok(result);
     }
     

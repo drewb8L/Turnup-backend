@@ -4,9 +4,9 @@ namespace Turnup.Services.CartService;
 
 public interface ICartService
 {
-    Task<ServiceResponse<Cart>> GetUserCart();
+    Task<ServiceResponse<Cart>> GetUserCart(string customerId);
 
-    Task<ServiceResponse<Cart>> CreateUserCart();
+    // Task<ServiceResponse<Cart>> CreateUserCart();
 
     Task<ServiceResponse<Cart>> AddItem();
 
