@@ -13,6 +13,8 @@ using Turnup;
 using Turnup.Configurations;
 using Turnup.Context;
 using Turnup.Entities;
+using Turnup.Services;
+using Turnup.Services.AuthService;
 using Turnup.Services.CartService;
 using Turnup.Services.EstablishmentService;
 using Turnup.Services.OrderService;
@@ -111,6 +113,7 @@ builder.Services.AddScoped<IEstablishmentService, EstablishmentService>();
 builder.Services.TryAddScoped<IScanService, ScanService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
