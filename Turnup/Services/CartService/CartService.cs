@@ -37,12 +37,19 @@ public class CartService : ICartService
 
     public async Task<ServiceResponse<Cart>> AddItem(int productId, int quantity, Claim? user)
     {
-        var cart = await GetCart(user) ?? CreateCart(user);
-        var response = new ServiceResponse<Cart>()
+        var record = await GetCart(user);
+        if (record.Data is null)
         {
-            Data = cart
-        };
-        return response;
+            var cart = CreateCart(user);
+            var response = new ServiceResponse<Cart>()
+            {
+                Data = cart
+            };
+
+            return response;
+        }
+        return record;
+        
     }
 
     public Task<ServiceResponse<Cart>> RemoveItem()
@@ -51,13 +58,19 @@ public class CartService : ICartService
     }
 
     
-    private async Task<Cart?> GetCart(Claim? user)
+    public async Task<ServiceResponse<Cart>> GetCart(Claim? user)
     {
         _user = user;
-        return await _context.Carts
+        var cart = await _context.Carts
             .Include(i => i.Items)
             .ThenInclude(p => p.Product)
             .FirstOrDefaultAsync(c => c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value);
+
+        var response = new ServiceResponse<Cart>()
+        {
+            Data = cart
+        };
+        return response;
     }
 
     private Cart CreateCart(Claim? user)

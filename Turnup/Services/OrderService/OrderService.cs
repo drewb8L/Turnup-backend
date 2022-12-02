@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
+using Turnup.Entities;
 using Turnup.Entities.OrderEntities;
+using Turnup.Services.CartService;
 
 namespace Turnup.Services.OrderService;
 
@@ -9,10 +11,12 @@ public class OrderService : IOrderService
 {
     private readonly TurnupDbContext _context;
     private readonly Claim? _user;
+    private ICartService _cartService;
 
-    public OrderService(TurnupDbContext context)
+    public OrderService(TurnupDbContext context, ICartService cartService)
     {
         _context = context;
+        _cartService = cartService;
     }
 
 
@@ -34,8 +38,8 @@ public class OrderService : IOrderService
 
     }
 
-    public async Task<ServiceResponse<Order>> PlaceOrder()
+    public async Task<ServiceResponse<Cart>> PlaceOrder(Claim? user)
     {
-        throw new NotImplementedException();
+      return await _cartService.GetCart(user);
     }
 }
