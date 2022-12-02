@@ -7,6 +7,7 @@ using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
 using Turnup.Entities.OrderEntities;
+using Turnup.Services.OrderService;
 
 namespace Turnup.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
@@ -15,10 +16,11 @@ namespace Turnup.Controllers;
 public class OrderController : ControllerBase
 {
     private readonly TurnupDbContext _context;
-
-    public OrderController(TurnupDbContext context)
+    private readonly IOrderService _orderService;
+    public OrderController(TurnupDbContext context, IOrderService orderService)
     {
         _context = context;
+        _orderService = orderService;
     }
 
   
@@ -27,15 +29,10 @@ public class OrderController : ControllerBase
     [Route("retrieve-order")]
     public async Task<ActionResult<Order>> RetrieveOrder(string establishmentId)
     {
-        var customerId = User.Claims.FirstOrDefault().Value;
-        var orders = await _context.Orders
-            .Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
-            .Include(o => o.OrderItems)
-            .ThenInclude(o => o.Product)
-            .ToListAsync();
+        var customerId = User.Claims.FirstOrDefault();
+        var orders = await _orderService.GetOrder(establishmentId, customerId);
         
-        
-        return Ok(orders);
+        return Ok(orders.Data);
     }
 
     [HttpGet]

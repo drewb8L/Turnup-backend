@@ -8,24 +8,29 @@ namespace Turnup.Services.OrderService;
 public class OrderService : IOrderService
 {
     private readonly TurnupDbContext _context;
-    private readonly ClaimsPrincipal _user;
+    private readonly Claim? _user;
 
-    public OrderService(TurnupDbContext context, ClaimsPrincipal user)
+    public OrderService(TurnupDbContext context)
     {
         _context = context;
-        _user = user;
     }
 
 
-    public async Task<ServiceResponse<Order>> GetOrder(string establishmentId)
+    public async Task<ServiceResponse<List<Order>>> GetOrder(string establishmentId, Claim? user)
     {
-        var customerId = _user.Claims.FirstOrDefault().Value;
-        var cartItems = await _context.Carts.Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
-            .Include(i => i.Items)
-            .Include(c => c.Subtotal)
-            .ToListAsync();
+        var customerId = user.Subject.Claims.FirstOrDefault().Value;
+        
 
-        throw new NotImplementedException();
+        var response = new ServiceResponse<List<Order>>()
+        {
+            Data = await _context.Orders
+                .Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(o => o.Product).ToListAsync()
+
+        };
+
+        return response;
 
     }
 
