@@ -1,13 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Turnup.DTOs;
 using Turnup.Entities;
 using Turnup.Services.AuthService;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
+
 
 namespace Turnup.Controllers;
 
@@ -18,7 +14,7 @@ public class AuthenticationController : ControllerBase
     
     private readonly IAuthService _authService;
     
-    public AuthenticationController(UserManager<AuthUser> userManager,IAuthService authService, IConfiguration configuration)
+    public AuthenticationController(IAuthService authService)
     {
         _authService = authService;
     }
