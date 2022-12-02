@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
+using Turnup.Services;
+using Turnup.Services.CartService;
 
 namespace Turnup.Controllers;
 
@@ -17,49 +19,57 @@ public class CartController : ControllerBase
 {
     private readonly TurnupDbContext _context;
     private string _establishmentId;
+    private readonly ICartService _cartService;
+    private Claim? _user;
 
-    public CartController(TurnupDbContext context)
+    public CartController(TurnupDbContext context, ICartService cartService)
     {
         _context = context;
-        
+        _cartService = cartService;
     }
 
     [HttpGet(Name = "GetCart")]
     public async Task<ActionResult<CartDTO>> Get(string establishmentId)
     {
         _establishmentId = establishmentId;
-        var cart = await GetCart();
+        _user = User.Claims.FirstOrDefault();
+        var cart = await _cartService.GetUserCart(establishmentId, _user);
+        if (cart.Data is null) return new CartDTO();
 
-        if (cart is null) return new CartDTO(); //NotFound();
-
-        return MapCartToDto(cart);
-
+        return MapCartToDto(cart.Data);
     }
-
-    
-
 
     [HttpPost("add-items")]
     public async Task<ActionResult<CartDTO>> AddItemToCart(int productId, int quantity)
     {
-
-        var cart = await GetCart() ?? CreateCart();
-
+        _user = User.Claims.FirstOrDefault();
+        var cart = await _cartService.AddItem(productId, quantity, _user); // ?? CreateCart();
 
         var product = await _context.Products.FindAsync(productId);
         if (product is null) return NotFound();
-        cart.AddItem(product, quantity);
-        cart.Subtotal = cart.CalculateSubtotal();
-        var result = await _context.SaveChangesAsync() > 0;
-        if(result) return CreatedAtRoute("GetCart", MapCartToDto(cart));
-        
+
+        if (cart.Data == null)
+            return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
+
+        var result = await SaveNewProduct(quantity, cart, product);
+        if (result) return CreatedAtRoute("GetCart", MapCartToDto(cart.Data));
+
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
+    }
+
+    private async Task<bool> SaveNewProduct(int quantity, ServiceResponse<Cart> cart, Product product)
+    {
+        cart.Data.AddItem(product, quantity);
+        cart.Data.Subtotal = cart.Data.CalculateSubtotal();
+        var result = await _context.SaveChangesAsync() > 0;
+        return result;
     }
 
     [HttpDelete]
     public async Task<ActionResult> RemoveCartItem(int productId, int quantity)
     {
-        var cart = await GetCart();
+        
+        var cart = await GetCart(productId);
         if (cart is null) return NotFound();
         var product = await _context.Products.FindAsync(productId);
         if (product is null) return NotFound();
@@ -69,37 +79,33 @@ public class CartController : ControllerBase
         {
             cart.Subtotal = 0.0m;
         }
+
         var result = await _context.SaveChangesAsync() > 0;
-        if(result) return StatusCode(201);
-        
+        if (result) return StatusCode(201);
+
         return BadRequest(new ProblemDetails { Title = "There's an issue removing your item to the cart!" });
     }
-    
-    
-    private async Task<Cart?> GetCart()
-    {
-        return await _context.Carts
-            .Include(i => i.Items)
-            .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(c => c.CustomerId == User.Claims.FirstOrDefault().Value);
-        
-    }
 
-    private  Cart CreateCart()
+
+    private async Task<Cart?> GetCart(int productId)
     {
-        var customerId = User.Claims.FirstOrDefault().Value;
-        var cart = new Cart { CustomerId = customerId};
-        _context.Carts.Add(cart);
-        return cart;
+        var product = await _context.Products.FindAsync(productId);
+        if (product is null)
+        {
+            return new Cart();
+        }
+        var user = User.Claims.FirstOrDefault();
+        var cart= await _cartService.GetUserCart(product.EstablishmentId, user);
+        return cart.Data;
     }
     
+
     private CartDTO MapCartToDto(Cart cart)
     {
-        
         return new CartDTO
         {
             Id = cart.Id,
-            CustomerId = User.Claims.FirstOrDefault().Value,
+            CustomerId = cart.CustomerId, //User.Claims.FirstOrDefault().Value,
             EstablishmentId = _establishmentId,
             Items = cart.Items.Select(item => new CartItemDTO
             {
@@ -108,7 +114,6 @@ public class CartController : ControllerBase
                 Name = item.Product.Title,
                 Price = item.Product.Price,
                 Quantity = item.Quantity,
-               
             }).ToList(),
             Subtotal = cart.CalculateSubtotal()
         };
