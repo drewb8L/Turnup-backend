@@ -1,14 +1,13 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
 using Turnup.Services;
 using Turnup.Services.CartService;
+using Turnup.Services.ProductService;
 
 namespace Turnup.Controllers;
 
@@ -18,14 +17,16 @@ namespace Turnup.Controllers;
 public class CartController : ControllerBase
 {
     private readonly TurnupDbContext _context;
-    private string _establishmentId;
+    private string? _establishmentId;
     private readonly ICartService _cartService;
+    private readonly IProductService _productService;
     private Claim? _user;
 
-    public CartController(TurnupDbContext context, ICartService cartService)
+    public CartController(TurnupDbContext context, ICartService cartService, IProductService productService)
     {
         _context = context;
         _cartService = cartService;
+        _productService = productService;
     }
 
     [HttpGet(Name = "GetCart")]
@@ -68,16 +69,19 @@ public class CartController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> RemoveCartItem(int productId, int quantity)
     {
+        var user = User.Claims.FirstOrDefault();
+        var cart = await _cartService.GetCart(user);
+        if (cart.Data is null) return NotFound();
+
+        var product = await _productService.GetProductAsync(productId);
+        if (product.Data is null) return NotFound();
         
-        var cart = await GetCart(productId);
-        if (cart is null) return NotFound();
-        var product = await _context.Products.FindAsync(productId);
-        if (product is null) return NotFound();
-        cart.RemoveItem(product.Id, quantity);
-        cart.Subtotal = cart.SubtractSubTotal();
-        if (cart.Items.Count == 0)
+        
+        cart.Data.RemoveItem(product.Data.Id, quantity);
+        cart.Data.Subtotal = cart.Data.SubtractSubTotal();
+        if (cart.Data.Items.Count == 0)
         {
-            cart.Subtotal = 0.0m;
+            cart.Data.Subtotal = 0.0m;
         }
 
         var result = await _context.SaveChangesAsync() > 0;
@@ -86,26 +90,13 @@ public class CartController : ControllerBase
         return BadRequest(new ProblemDetails { Title = "There's an issue removing your item to the cart!" });
     }
 
-
-    private async Task<Cart?> GetCart(int productId)
-    {
-        var product = await _context.Products.FindAsync(productId);
-        if (product is null)
-        {
-            return new Cart();
-        }
-        var user = User.Claims.FirstOrDefault();
-        var cart= await _cartService.GetUserCart(product.EstablishmentId, user);
-        return cart.Data;
-    }
     
-
     private CartDTO MapCartToDto(Cart cart)
     {
         return new CartDTO
         {
             Id = cart.Id,
-            CustomerId = cart.CustomerId, //User.Claims.FirstOrDefault().Value,
+            CustomerId = cart.CustomerId,
             EstablishmentId = _establishmentId,
             Items = cart.Items.Select(item => new CartItemDTO
             {

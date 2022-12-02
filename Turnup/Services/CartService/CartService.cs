@@ -51,12 +51,6 @@ public class CartService : ICartService
         return record;
         
     }
-
-    public Task<ServiceResponse<Cart>> RemoveItem()
-    {
-        throw new NotImplementedException();
-    }
-
     
     public async Task<ServiceResponse<Cart>> GetCart(Claim? user)
     {
