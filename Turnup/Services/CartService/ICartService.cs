@@ -11,6 +11,8 @@ public interface ICartService
 
     Task<ServiceResponse<Cart>> AddItem(int productId, int quantity, Claim? user);
 
-    Task<ServiceResponse<Cart>> RemoveItem();
+    
+    Task<ServiceResponse<Cart>> GetCart(Claim? user);
+    
     
 }

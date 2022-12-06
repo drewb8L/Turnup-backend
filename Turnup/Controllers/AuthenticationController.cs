@@ -1,14 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Turnup.Configurations;
 using Turnup.DTOs;
 using Turnup.Entities;
-using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
+using Turnup.Services.AuthService;
+
 
 namespace Turnup.Controllers;
 
@@ -16,16 +11,12 @@ namespace Turnup.Controllers;
 [ApiController]
 public class AuthenticationController : ControllerBase
 {
-    private readonly UserManager<AuthUser> _userManager;
-
-    private readonly IConfiguration _configuration;
     
-
-    public AuthenticationController(UserManager<AuthUser> userManager, IConfiguration configuration)
+    private readonly IAuthService _authService;
+    
+    public AuthenticationController(IAuthService authService)
     {
-        _userManager = userManager;
-        _configuration = configuration;
-        
+        _authService = authService;
     }
 
 
@@ -35,7 +26,7 @@ public class AuthenticationController : ControllerBase
     {
         if (ModelState.IsValid)
         {
-            var userExists = await _userManager.FindByEmailAsync(requestDto.Email);
+            var userExists = await _authService.FindByEmail(requestDto.Email);
 
             if (userExists is not null)
             {
@@ -58,10 +49,10 @@ public class AuthenticationController : ControllerBase
                 Role = role.ToString()
             };
 
-            var createUser = await _userManager.CreateAsync(newUser, requestDto.Password);
+            var createUser = await _authService.CreateNewUser(newUser, requestDto.Password);
             if (createUser.Succeeded)
             {
-                var token = GenerateJwtToken(newUser);
+                var token = _authService.GenerateJwtToken(newUser);
                 return Ok(new AuthResult()
                 {
                     Result = true,
@@ -88,7 +79,7 @@ public class AuthenticationController : ControllerBase
     {
         if (ModelState.IsValid)
         {
-            var existingUser = await _userManager.FindByEmailAsync(authUserLoginDto.Email);
+            var existingUser = await _authService.FindByEmail(authUserLoginDto.Email);
             if (existingUser is null)
                 return BadRequest(new AuthResult()
                 {
@@ -99,7 +90,7 @@ public class AuthenticationController : ControllerBase
                     Result = false
                 });
 
-            var validInfo = await _userManager.CheckPasswordAsync(existingUser, authUserLoginDto.Password);
+            var validInfo = await _authService.CheckPasswordAsync(existingUser, authUserLoginDto.Password);
 
             if (!validInfo)
                 return BadRequest(new AuthResult()
@@ -111,7 +102,7 @@ public class AuthenticationController : ControllerBase
                     Result = false
                 });
 
-            var jwtToken = GenerateJwtToken(existingUser);
+            var jwtToken = _authService.GenerateJwtToken(existingUser);
             return Ok(new AuthResult()
             {
                 Token = jwtToken,
@@ -130,30 +121,5 @@ public class AuthenticationController : ControllerBase
         });
     }
 
-    private string GenerateJwtToken(AuthUser user)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_configuration.GetSection("JwtConfig:Secret").Value);
-
-        var tokenDescriptor = new SecurityTokenDescriptor()
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim("Id", user.Id),
-                new Claim(ClaimTypes.Role, user.Role ),
-                new Claim("Name", user.Name),
-                new Claim("Role",user.Role),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Email, value: user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString())
-            }),
-            Expires = DateTime.UtcNow.AddHours(12),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-        };
-        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-        var jwtToken = jwtTokenHandler.WriteToken(token);
-
-        return jwtToken;
-    }
+    
 }

@@ -1,36 +1,45 @@
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Turnup.Context;
+using Turnup.Entities;
 using Turnup.Entities.OrderEntities;
+using Turnup.Services.CartService;
 
 namespace Turnup.Services.OrderService;
 
 public class OrderService : IOrderService
 {
     private readonly TurnupDbContext _context;
-    private readonly ClaimsPrincipal _user;
+    private readonly Claim? _user;
+    private ICartService _cartService;
 
-    public OrderService(TurnupDbContext context, ClaimsPrincipal user)
+    public OrderService(TurnupDbContext context, ICartService cartService)
     {
         _context = context;
-        _user = user;
+        _cartService = cartService;
     }
 
 
-    public async Task<ServiceResponse<Order>> GetOrder(string establishmentId)
+    public async Task<ServiceResponse<List<Order>>> GetOrder(string establishmentId, Claim? user)
     {
-        var customerId = _user.Claims.FirstOrDefault().Value;
-        var cartItems = await _context.Carts.Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
-            .Include(i => i.Items)
-            .Include(c => c.Subtotal)
-            .ToListAsync();
+        var customerId = user.Subject.Claims.FirstOrDefault().Value;
+        
 
-        throw new NotImplementedException();
+        var response = new ServiceResponse<List<Order>>()
+        {
+            Data = await _context.Orders
+                .Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(o => o.Product).ToListAsync()
+
+        };
+
+        return response;
 
     }
 
-    public async Task<ServiceResponse<Order>> PlaceOrder()
+    public async Task<ServiceResponse<Cart>> PlaceOrder(Claim? user)
     {
-        throw new NotImplementedException();
+      return await _cartService.GetCart(user);
     }
 }

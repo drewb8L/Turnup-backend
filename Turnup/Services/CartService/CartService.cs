@@ -37,27 +37,34 @@ public class CartService : ICartService
 
     public async Task<ServiceResponse<Cart>> AddItem(int productId, int quantity, Claim? user)
     {
-        var cart = await GetCart(user) ?? CreateCart(user);
+        var record = await GetCart(user);
+        if (record.Data is null)
+        {
+            var cart = CreateCart(user);
+            var response = new ServiceResponse<Cart>()
+            {
+                Data = cart
+            };
+
+            return response;
+        }
+        return record;
+        
+    }
+    
+    public async Task<ServiceResponse<Cart>> GetCart(Claim? user)
+    {
+        _user = user;
+        var cart = await _context.Carts
+            .Include(i => i.Items)
+            .ThenInclude(p => p.Product)
+            .FirstOrDefaultAsync(c => c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value);
+
         var response = new ServiceResponse<Cart>()
         {
             Data = cart
         };
         return response;
-    }
-
-    public Task<ServiceResponse<Cart>> RemoveItem()
-    {
-        throw new NotImplementedException();
-    }
-
-    
-    private async Task<Cart?> GetCart(Claim? user)
-    {
-        _user = user;
-        return await _context.Carts
-            .Include(i => i.Items)
-            .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(c => c.CustomerId == _user.Subject.Claims.FirstOrDefault().Value);
     }
 
     private Cart CreateCart(Claim? user)

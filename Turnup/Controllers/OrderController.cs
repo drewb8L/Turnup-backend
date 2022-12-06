@@ -7,6 +7,9 @@ using Turnup.Context;
 using Turnup.DTOs;
 using Turnup.Entities;
 using Turnup.Entities.OrderEntities;
+using Turnup.Services;
+using Turnup.Services.CartService;
+using Turnup.Services.OrderService;
 
 namespace Turnup.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "customer")]
@@ -15,60 +18,58 @@ namespace Turnup.Controllers;
 public class OrderController : ControllerBase
 {
     private readonly TurnupDbContext _context;
-
-    public OrderController(TurnupDbContext context)
+    private readonly IOrderService _orderService;
+    
+    public OrderController(TurnupDbContext context, IOrderService orderService)
     {
         _context = context;
+        _orderService = orderService;
+        
     }
 
   
 
     [HttpGet]
     [Route("retrieve-order")]
-    public async Task<ActionResult<Order>> RetrieveOrder(string establishmentId)
+    public async Task<ActionResult<List<Order>>> RetrieveOrder(string establishmentId)
     {
-        var customerId = User.Claims.FirstOrDefault().Value;
-        var orders = await _context.Orders
-            .Where(c => c.CustomerId == customerId && c.EstablishmentId == establishmentId)
-            .Include(o => o.OrderItems)
-            .ThenInclude(o => o.Product)
-            .ToListAsync();
+        var customerId = User.Claims.FirstOrDefault();
+        var orders = await _orderService.GetOrder(establishmentId, customerId);
         
-        
-        return Ok(orders);
+        return Ok(orders.Data);
     }
 
     [HttpGet]
     [Route("place-order")]
     public async Task<ActionResult<Order>> PlaceOrder()
     {
-        var customerId = User.Claims.FirstOrDefault().Value;
-        var cart = await _context.Carts.Where(c => c.CustomerId == customerId)
-            .Include(c => c.Items)
-            .ThenInclude(i => i.Product)
-            .FirstOrDefaultAsync();
-        
-        
+        var customerId = User.Claims.FirstOrDefault();
+        var cart = await _orderService.PlaceOrder(customerId);
+
+        var order = await Order(cart);
+
+        return CreatedAtAction("RetrieveOrder", order);
+    }
+
+    private async Task<Order> Order(ServiceResponse<Cart> cart)
+    {
         var order = new Order
         {
-            CustomerId = customerId,
-            EstablishmentId = cart.EstablishmentId,
+            CustomerId = cart.Data.CustomerId,
+            EstablishmentId = cart.Data.EstablishmentId,
             OrderDate = DateTime.Now,
             OrderItems = new List<OrderItem>(),
-            Status  = OrderStatus.Pending.ToString(),
-            SubTotal = cart.Subtotal,
+            Status = OrderStatus.Pending.ToString(),
+            SubTotal = cart.Data.Subtotal,
         };
 
-        order.OrderItems.AddRange(MapCartItemToOrderItem(cart.Items));
+        order.OrderItems.AddRange(MapCartItemToOrderItem(cart.Data.Items));
         order.Total = order.CalculateTotal();
 
         await _context.Orders.AddAsync(order);
-        _context.Carts.Remove(cart);
+        _context.Carts.Remove(cart.Data);
         await _context.SaveChangesAsync();
-        
-        
-        return CreatedAtAction("RetrieveOrder", order);
-
+        return order;
     }
 
     private List<OrderItem> MapCartItemToOrderItem(List<CartItem> cartItems)
