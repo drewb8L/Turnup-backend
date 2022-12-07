@@ -39,7 +39,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ServiceResponse<Product>>> CreateNewProduct(string title, string description, string imageUrl, long price )
+    public async Task<ActionResult<ServiceResponse<Product>>> CreateNewProduct(string title, string description, string imageUrl, decimal price )
     {
         var establishmentId = User.Claims.FirstOrDefault().Value;
         var result = await _productService.CreateNewProduct(title, description, imageUrl, price, establishmentId);
