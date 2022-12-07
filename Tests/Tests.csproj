@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="AutoFixture" Version="4.17.0" />
+        <PackageReference Include="EntityFramework" Version="6.4.4" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
         <PackageReference Include="Moq" Version="4.18.3" />
         <PackageReference Include="xunit" Version="2.4.1" />
@@ -21,10 +22,15 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Z.EntityFramework.Classic" Version="7.1.67" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Turnup\Turnup.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="TestHelpers" />
     </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@ using Moq;
 using NuGet.Protocol;
 using Turnup.Controllers;
 using Turnup.Entities;
+using Turnup.Entities.OrderEntities;
 using Turnup.Services;
 using Turnup.Services.ProductService;
 
@@ -34,7 +35,7 @@ public class ProductControllerTests
     public async Task GetProductsThisEstablishmentOwns()
     {
         var establishment= _fixture.Create<Establishment>();
-        var claimsPrincipal = ClaimsPrincipal(establishment, out var claims, out var identity);
+        var claimsPrincipal = Helpers.EstablishmentClaimsPrincipal(establishment, out var claims, out var identity);
 
 
         var sr = new ServiceResponse<List<Product>>()
@@ -93,7 +94,7 @@ public class ProductControllerTests
     public async Task CreateNewProduct()
     {
         var establishment = _fixture.Create<Establishment>();
-        var claimsPrincipal = ClaimsPrincipal(establishment, out var claims, out var identity);
+        var claimsPrincipal = Helpers.EstablishmentClaimsPrincipal(establishment, out var claims, out var identity);
         var product = _fixture.Create<Product>();
         var sr = new ServiceResponse<Product>()
         {
@@ -123,22 +124,4 @@ public class ProductControllerTests
 
 
     }
-    
-    
-    
-    
-    
-    private static ClaimsPrincipal ClaimsPrincipal(Establishment establishment, out List<Claim> claims,
-        out ClaimsIdentity identity)
-    {
-        claims = new List<Claim>()
-        {
-            new Claim("Id", establishment.Id.ToString()),
-            new Claim(ClaimTypes.Role, Roles.establishment.ToString()),
-        };
-        identity = new ClaimsIdentity(claims, "TestAuthType");
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-        return claimsPrincipal;
-    }
-    
 }
