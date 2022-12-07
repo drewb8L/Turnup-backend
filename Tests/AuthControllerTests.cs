@@ -32,26 +32,7 @@ public class AuthControllerTests
     [Fact]
     public async Task Register()
     {
-        var user = _fixture.Create<AuthUser>();
-        var newUser = new AuthUserRegisterDTO()
-        {
-            Name = "Test123",
-            Email = "test123@aol.com",
-            Password = "MyPass@word1"
-        };
-
-        var newAuthUser = new AuthUser()
-        {
-            Name = newUser.Name,
-            Email = newUser.Email,
-            Role = Roles.customer.ToString()
-        };
-
-        var service = await _authService.CreateNewUser(newAuthUser, newUser.Password);
-        //_controller = new AuthenticationController();
-        //var result = await _controller.Register(newUser, Roles.customer);
-
-        Assert.True(service.Succeeded);
+        
 
     }
     
