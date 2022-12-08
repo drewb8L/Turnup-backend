@@ -16,15 +16,15 @@ namespace Turnup.Controllers;
 [ApiController]
 public class CartController : ControllerBase
 {
-    private readonly TurnupDbContext _context;
+    
     private string? _establishmentId;
     private readonly ICartService _cartService;
     private readonly IProductService _productService;
     private Claim? _user;
 
-    public CartController(TurnupDbContext context, ICartService cartService, IProductService productService)
+    public CartController( ICartService cartService, IProductService productService)
     {
-        _context = context;
+        
         _cartService = cartService;
         _productService = productService;
     }
@@ -46,25 +46,19 @@ public class CartController : ControllerBase
         _user = User.Claims.FirstOrDefault();
         var cart = await _cartService.AddItem(productId, quantity, _user); // ?? CreateCart();
 
-        var product = await _context.Products.FindAsync(productId);
-        if (product is null) return NotFound();
+        //var product = await _context.Products.FindAsync(productId);
+        var product = await _productService.GetProductAsync(productId);
+        if (product.Data is null) return NotFound();
 
         if (cart.Data == null)
             return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
 
-        var result = await SaveNewProduct(quantity, cart, product);
+        var result = await _cartService.SaveNewProduct(quantity, cart, product.Data);
         if (result) return CreatedAtRoute("GetCart", MapCartToDto(cart.Data));
 
         return BadRequest(new ProblemDetails { Title = "There's an issue saving your item to the cart!" });
     }
-
-    private async Task<bool> SaveNewProduct(int quantity, ServiceResponse<Cart> cart, Product product)
-    {
-        cart.Data.AddItem(product, quantity);
-        cart.Data.Subtotal = cart.Data.CalculateSubtotal();
-        var result = await _context.SaveChangesAsync() > 0;
-        return result;
-    }
+    
 
     [HttpDelete]
     public async Task<ActionResult> RemoveCartItem(int productId, int quantity)
@@ -77,14 +71,7 @@ public class CartController : ControllerBase
         if (product.Data is null) return NotFound();
         
         
-        cart.Data.RemoveItem(product.Data.Id, quantity);
-        cart.Data.Subtotal = cart.Data.SubtractSubTotal();
-        if (cart.Data.Items.Count == 0)
-        {
-            cart.Data.Subtotal = 0.0m;
-        }
-
-        var result = await _context.SaveChangesAsync() > 0;
+        var result = await _cartService.RemoveCartItem(productId, quantity, cart.Data, product.Data);
         if (result) return StatusCode(201);
 
         return BadRequest(new ProblemDetails { Title = "There's an issue removing your item to the cart!" });
