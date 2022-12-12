@@ -8,6 +8,6 @@ public interface IOrderService
 {
     Task<ServiceResponse<List<Order>>> GetOrder(string establishmentId, Claim? user);
 
-    Task<ServiceResponse<Cart>> PlaceOrder(Claim? user);
+    Task<ServiceResponse<Order>> PlaceOrder(Claim? user);
     
 }
