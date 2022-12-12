@@ -35,7 +35,8 @@ public class CartController : ControllerBase
         _establishmentId = establishmentId;
         _user = User.Claims.FirstOrDefault();
         var cart = await _cartService.GetUserCart(establishmentId, _user);
-        if (cart.Data is null) return new CartDTO();
+        if (cart is null ) return new CartDTO();
+        if (cart.Data is null ) return new CartDTO();
 
         return MapCartToDto(cart.Data);
     }
@@ -46,7 +47,7 @@ public class CartController : ControllerBase
         _user = User.Claims.FirstOrDefault();
         var cart = await _cartService.AddItem(productId, quantity, _user); // ?? CreateCart();
 
-        //var product = await _context.Products.FindAsync(productId);
+       
         var product = await _productService.GetProductAsync(productId);
         if (product.Data is null) return NotFound();
 
