@@ -51,10 +51,7 @@ public class AuthService : IAuthService
        return await _userManager.FindByEmailAsync(email);
     }
 
-    public  async Task<IdentityResult> RegisterNewUser(AuthUser newUser, string password)
-    {
-        throw new NotImplementedException();
-    }
+    
 
     public async Task<IdentityResult> CreateNewUser(AuthUser newUser, string password)
     {

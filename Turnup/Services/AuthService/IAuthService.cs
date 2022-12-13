@@ -9,8 +9,6 @@ public interface IAuthService
 
     public Task<AuthUser?> FindByEmail(string email);
 
-    public Task<IdentityResult> RegisterNewUser(AuthUser newUser, string password);
-
     public Task<IdentityResult> CreateNewUser(AuthUser user, string password);
 
     public Task<bool> CheckPasswordAsync(AuthUser? existingUser, string password);

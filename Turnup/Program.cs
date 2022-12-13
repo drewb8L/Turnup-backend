@@ -29,12 +29,15 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+// uncomment if on windows
 //var dbPath = Path.Join(Directory.GetCurrentDirectory(), "turnup.db");
 //var conn = new SqliteConnection($"Data Source=C:\\turnupapi\\turnup.db");
 
 builder.Services.AddDbContext<TurnupDbContext>(options =>
 {
+    // comment if on mac or linux
     options.UseSqlServer("name=DefaultConnection");
+    //uncomment if on windows
     //options.UseSqlite(conn);
 
 });
